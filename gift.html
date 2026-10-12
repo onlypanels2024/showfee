@@ -1,0 +1,25 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="assets/favicon.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css">
+<title>Your ShowFee thank-you gift</title>
+<meta name="robots" content="noindex">
+<style>.gift{max-width:520px;margin:0 auto;text-align:center}.gift .btn{font-size:18px;padding:16px 28px;margin:22px 0 10px}.code{display:inline-block;margin-top:8px;padding:8px 14px;border:1px dashed #f0a43a;border-radius:10px;font-weight:700;letter-spacing:1px}</style>
+</head><body>
+<header class="top"><div class="wrap"><a class="logo" href="index.html"><img src="assets/logo-180.png" alt=""><span class="brand"><span class="grad">S</span>how<span class="grad">F</span>ee</span></a></div></header>
+<main><section><div class="wrap gift">
+  <img class="hero-logo" src="assets/logo-180.png" alt="ShowFee logo" style="margin:0 auto">
+  <h1>Thank you for <span class="grad">testing</span>! 🎁</h1>
+  <p class="lead">Your gift is a free year of ShowFee Pro. Tap the button on the phone that has ShowFee installed.</p>
+  <a class="btn" id="go" href="#">Get my free year</a>
+  <p style="color:var(--dim);font-size:14px">ShowFee opens and Pro is unlocked straight away. Nothing is bought and nothing will be charged.</p>
+  <div class="f" style="margin-top:26px;text-align:left">
+    <h3 style="margin-bottom:6px">Button didn't open the app?</h3>
+    <p style="margin:0">Open ShowFee, go to <b>Settings → ShowFee Pro → Have an access code</b> and type:<br><span class="code" id="code">—</span></p>
+  </div>
+</div></section></main>
+<footer><div class="wrap"><div><a href="index.html">Home</a><a href="privacy.html">Privacy policy</a><a href="mailto:showfee.app@gmail.com">Contact</a></div><div>© 2026 ShowFee · Made in Malta</div></div></footer>
+<script>
+var c=(new URLSearchParams(location.search).get('c')||'').replace(/[^A-Za-z0-9-]/g,'').toUpperCase();
+document.getElementById('code').textContent=c||'—';
+var play='https://play.google.com/store/apps/details?id=com.showfee.app';
+document.getElementById('go').href='intent://gift?code='+encodeURIComponent(c)+'#Intent;scheme=showfee;package=com.showfee.app;S.browser_fallback_url='+encodeURIComponent(play)+';end';
+</script>
+</body></html>
