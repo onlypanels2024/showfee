@@ -27,90 +27,61 @@
     jobs.classList.add('mq');
   }
 
-  // floating booking cards: Owed -> Paid
-  var hero = document.querySelector('.hero');
-  var items = [['Wedding','€450'],['DJ set','€300'],['Photo shoot','€220'],['PT session','€40'],['Tutoring','€35'],['Make-up','€90'],['Corporate gig','€600'],['Dog walking','€25'],['Hair & styling','€120'],['Birthday party','€250']];
-  var fx = document.createElement('div'); fx.className = 'fx'; fx.setAttribute('aria-hidden','true'); hero.insertBefore(fx, hero.firstChild);
-  var n = 0, visible = true, spots = [];
-  function spot(){
-    var W = hero.clientWidth, H = hero.clientHeight, narrow = W < 860, x, y, tries = 0;
-    do {
-      x = narrow ? (Math.random() < .5 ? 1 + Math.random()*6 : 60 + Math.random()*30) : 56 + Math.random()*34;
-      y = narrow ? 64 + Math.random()*30 : 10 + Math.random()*78;
-      tries++;
-    } while (tries < 15 && spots.some(function(s){ return Math.abs(s[0]-x) < 18 && Math.abs(s[1]-y) < 12; }));
-    return [x, y];
-  }
-  function chip(){
-    if (!visible || document.hidden) return;
-    var it = items[n++ % items.length], p = spot(), c = document.createElement('div');
-    c.className = 'chip'; c.style.left = p[0]+'%'; c.style.top = p[1]+'%';
-    c.innerHTML = '<i>€</i><span><b>'+it[0]+'</b> · '+it[1]+'</span><span class="st">Owed</span>';
-    fx.appendChild(c); spots.push(p);
-    var over = c.offsetLeft + c.offsetWidth - (hero.clientWidth - 12); if (over > 0) c.style.left = Math.max(8, c.offsetLeft - over) + 'px';
-    requestAnimationFrame(function(){ requestAnimationFrame(function(){ c.classList.add('on'); }); });
-    setTimeout(function(){ c.classList.add('paid'); c.querySelector('i').textContent = '✓'; c.querySelector('.st').textContent = 'Paid'; }, 1500 + Math.random()*700);
-    setTimeout(function(){ c.classList.add('off'); }, 4200);
-    setTimeout(function(){ c.remove(); spots.splice(spots.indexOf(p), 1); }, 5400);
-  }
-  if ('IntersectionObserver' in window) new IntersectionObserver(function(e){ visible = e[0].isIntersecting; }).observe(hero);
-  chip(); setTimeout(chip, 700); setInterval(chip, hero.clientWidth < 860 ? 2200 : 1300);
-
-  // "you got paid" notification on the hero phone
-  var phone = document.querySelector('.hero .device');
-  if (phone) {
-    var notes = [['Payment received','Joanna &amp; Mark paid €450 for the wedding ✓'],['Invoice sent','Invoice #024 sent to The Grand Hotel'],['Reminder ready','Bob\'s Bar is 7 days late – tap to send a friendly reminder'],['Payment received','Bright Events paid €300 by PayPal ✓']];
-    var box = document.createElement('div'); box.className = 'note'; box.setAttribute('aria-hidden','true'); phone.appendChild(box);
-    var k = 0;
-    function show(){
-      if (!visible || document.hidden) return;
-      var m = notes[k++ % notes.length];
-      box.innerHTML = '<img src="assets/logo-180.png" alt=""><div><b>ShowFee · now</b>'+m[1]+'</div>';
-      box.classList.add('on'); setTimeout(function(){ box.classList.remove('on'); }, 3200);
+  // ShowFee's own background: a faint diary where days light up as booked, then turn green when paid
+  (function(){
+    var hero = document.querySelector('.hero'); if (!hero) return;
+    var now = new Date(), y = now.getFullYear(), m = now.getMonth();
+    var first = (new Date(y, m, 1).getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate();
+    var cal = document.createElement('div'); cal.className = 'cal'; cal.setAttribute('aria-hidden','true');
+    var html = '<div class="cal-m">' + now.toLocaleString('en-GB', {month:'long'}) + '</div><div class="cal-g">';
+    'MTWTFSS'.split('').forEach(function(d){ html += '<span class="cal-h">' + d + '</span>'; });
+    for (var i = 0; i < 35; i++){ var n = i - first + 1; html += '<span class="cal-d' + (n === now.getDate() ? ' today' : '') + '">' + (n >= 1 && n <= days ? n : '') + '</span>'; }
+    cal.innerHTML = html + '</div>'; hero.insertBefore(cal, hero.firstChild);
+    var cells = [].slice.call(cal.querySelectorAll('.cal-d')).filter(function(c){ return c.textContent; }), vis = true;
+    if ('IntersectionObserver' in window) new IntersectionObserver(function(e){ vis = e[0].isIntersecting; }).observe(hero);
+    function step(){
+      if (!vis || document.hidden) return;
+      var free = cells.filter(function(c){ return !c.className.match(/booked|paid/); });
+      if (cal.querySelectorAll('.booked,.paid').length >= 7 || !free.length) return;
+      var c = free[Math.floor(Math.random() * free.length)];
+      c.classList.add('booked');
+      setTimeout(function(){ c.classList.remove('booked'); c.classList.add('paid'); }, 1800 + Math.random() * 1200);
+      setTimeout(function(){ c.classList.remove('paid'); }, 6500 + Math.random() * 2500);
     }
-    setTimeout(show, 1800); setInterval(show, 5000);
-  }
+    step(); setTimeout(step, 400); setTimeout(step, 900); setInterval(step, 1100);
+  })();
 
   // ===== Further down the page =====
 
-  // cards that float beside the phone in each section, flipping when "paid"
-  var rowSets = [
-    {cls:'', items:[['Radisson Blu','€400','Overdue','late'],['Joanna & Mark','€900','Owed'],['Bob\'s Bar','€150','Owed']], done:'Paid'},
-    {cls:'blue', items:[['PayPal','€300','Link sent'],['Revolut','€120','Link sent'],['Stripe','€450','Link sent']], done:'Paid'},
-    {cls:'late', items:[['Bob\'s Bar','7 days late','Late'],['Radisson Blu','12 days late','Late']], done:'Reminder sent'},
-    {cls:'blue', items:[['Invoice #024','€450','Creating PDF'],['Invoice #025','€300','Creating PDF']], done:'Sent'}
-  ];
-  document.querySelectorAll('.rows .row').forEach(function(row, ri){
-    var vis = row.querySelector('.vis'), dev = vis.firstElementChild, set = rowSets[ri]; if (!set) return;
-    var on = false, i = 0, side = 0;
-    new IntersectionObserver(function(e){ on = e[0].isIntersecting; }, {threshold:.25}).observe(vis);
-    function spawn(){
-      if (!on || document.hidden) return;
-      var it = set.items[i++ % set.items.length], s = document.createElement('div'); s.className = 'side';
-      var cls = it[3] || set.cls;
-      s.innerHTML = '<div class="chip '+cls+'"><i>'+(cls==='late'?'!':'€')+'</i><span><b>'+it[0]+'</b> · '+it[1]+'</span><span class="st">'+it[2]+'</span></div>';
-      vis.appendChild(s);
-      var c = s.firstChild, vr = vis.getBoundingClientRect(), dr = dev.getBoundingClientRect(), w = c.offsetWidth, h = c.offsetHeight;
-      var left = (side++ % 2 === 0) ? dr.left - vr.left - w * .55 : dr.right - vr.left - w * .45;
-      var top = dr.top - vr.top + dr.height * (.18 + Math.random() * .6);
-      var pageLeft = vr.left + left; if (pageLeft < 8) left += 8 - pageLeft; if (vr.left + left + w > innerWidth - 8) left -= vr.left + left + w - innerWidth + 8;
-      s.style.left = left + 'px'; s.style.top = top + 'px';
-      requestAnimationFrame(function(){ requestAnimationFrame(function(){ c.classList.add('on'); }); });
-      setTimeout(function(){ c.classList.remove('late','blue'); c.classList.add('paid'); c.querySelector('i').textContent = '✓'; c.querySelector('.st').textContent = set.done; }, 1600);
-      setTimeout(function(){ c.classList.add('off'); }, 4000);
-      setTimeout(function(){ s.remove(); }, 5200);
+  // follows the mouse: soft glow + a dot grid that shows up around the pointer; diary days and buttons react too
+  (function(){
+    var root = document.documentElement, fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+    var dots = document.createElement('div'); dots.className = 'dots'; dots.setAttribute('aria-hidden','true');
+    var glow = document.createElement('div'); glow.className = 'glow'; glow.setAttribute('aria-hidden','true');
+    document.body.insertBefore(glow, document.body.firstChild); document.body.insertBefore(dots, document.body.firstChild);
+    var tx = innerWidth * .7, ty = innerHeight * .35, x = tx, y = ty, active = !fine;
+    if (fine) addEventListener('pointermove', function(e){ tx = e.clientX; ty = e.clientY; if (!active){ active = true; root.classList.add('m-on'); } }, {passive:true});
+    else root.classList.add('m-on');
+    document.addEventListener('mouseleave', function(){ root.classList.remove('m-on'); active = false; });
+    var cells = [].slice.call(document.querySelectorAll('.cal-d')), mags = [].slice.call(document.querySelectorAll('.btn.play, nav a.nav-get'));
+    function loop(t){
+      if (!fine){ tx = innerWidth * (.5 + .38 * Math.sin(t / 5200)); ty = innerHeight * (.45 + .3 * Math.sin(t / 3900)); }
+      x += (tx - x) * .12; y += (ty - y) * .12;
+      root.style.setProperty('--mx', x.toFixed(1) + 'px'); root.style.setProperty('--my', y.toFixed(1) + 'px');
+      if (fine && active) {
+        cells.forEach(function(c){ var r = c.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+          var d = Math.hypot(r.left + r.width / 2 - x, r.top + r.height / 2 - y), p = Math.max(0, 1 - d / 190);
+          c.style.setProperty('--p', p.toFixed(2)); });
+      }
+      requestAnimationFrame(loop);
     }
-    setInterval(spawn, 2600 + ri * 150);
-  });
-
-  // PAID stamp on the invoice
-  var paper = document.querySelector('.rows .paper');
-  if (paper) {
-    var st = document.createElement('div'); st.className = 'stamp'; st.textContent = 'PAID'; st.setAttribute('aria-hidden','true'); paper.appendChild(st);
-    new IntersectionObserver(function(e){ st.classList.toggle('go', e[0].isIntersecting); }, {threshold:.4}).observe(paper);
-    st.addEventListener('animationiteration', function(){ setTimeout(function(){ paper.classList.remove('thud'); void paper.offsetWidth; paper.classList.add('thud'); }, 400); });
-    setTimeout(function(){ paper.classList.add('thud'); }, 0);
-  }
+    requestAnimationFrame(loop);
+    if (fine) mags.forEach(function(b){
+      b.addEventListener('pointermove', function(e){ var r = b.getBoundingClientRect();
+        b.style.transform = 'translate(' + ((e.clientX - r.left - r.width / 2) * .18).toFixed(1) + 'px,' + ((e.clientY - r.top - r.height / 2) * .3).toFixed(1) + 'px)'; });
+      b.addEventListener('pointerleave', function(){ b.style.transform = ''; });
+    });
+  })();
 
   // screenshots in "everything else": how far each one can scroll
   function pans(){ document.querySelectorAll('.more .crop').forEach(function(cr){ var im = cr.querySelector('img'); if (!im) return;
