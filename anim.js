@@ -74,7 +74,8 @@
     // 3. envelope gliding
     el(rows[2] && rows[2].querySelector('.copy'), 'env', svg('0 0 60 42', '<rect x="2" y="2" width="56" height="38" rx="5"/><path d="M3 5l27 19L57 5"/>'));
     // 4. invoice lines drawing themselves
-    el(rows[3] && rows[3].querySelector('.copy'), 'lines', svg('0 0 150 120', '<path d="M10 14h70"/><path d="M10 34h130"/><path d="M10 52h130"/><path d="M10 70h100"/><path d="M80 96h60"/><path d="M80 104h60"/>'));
+    el(rows[3] && rows[3].querySelector('.copy'), 'lines', svg('0 0 96 58', '<path d="M2 4h40"/><path d="M2 16h92"/><path d="M2 27h92"/><path d="M2 38h66"/><path d="M52 50h42"/><path d="M52 56h42"/>'));
+    document.querySelectorAll('.rows .copy').forEach(function(cp){ if (cp.querySelector('.deco')) cp.classList.add('has-deco'); });
     // 5. four tiny icons for the four cards
     var mw = document.querySelector('.more .wrap'), icons = [
       svg('0 0 30 30', '<rect x="4" y="6" width="22" height="20" rx="3"/><path d="M4 12h22M10 3v6M20 3v6"/>'),
