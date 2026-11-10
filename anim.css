@@ -25,7 +25,18 @@
 @keyframes pulse{70%{box-shadow:0 0 0 10px rgba(40,190,255,0)}100%{box-shadow:0 0 0 0 rgba(40,190,255,0)}}
 
 /* floating booking cards that turn from Owed to Paid */
-.flow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.cal{position:absolute;right:3%;top:50%;transform:translateY(-50%);width:min(560px,46%);z-index:0;pointer-events:none;opacity:.75}
+.cal-m{font-weight:600;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:rgba(170,179,214,.35);margin:0 0 10px 4px}
+.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.cal-h{font-size:11px;text-align:center;color:rgba(170,179,214,.3);font-weight:600}
+.cal-d{aspect-ratio:1;border-radius:12px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.015);display:flex;align-items:flex-start;justify-content:flex-end;padding:6px 8px;font-size:11px;color:rgba(170,179,214,.28);position:relative;transition:background .7s,border-color .7s,box-shadow .7s,color .7s}
+.cal-d.today{border-color:rgba(40,190,255,.25)}
+.cal-d:after{content:"";position:absolute;left:50%;top:56%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;opacity:0;transform:scale(.4);transition:opacity .4s,transform .45s cubic-bezier(.3,1.6,.5,1)}
+.cal-d.booked{background:linear-gradient(135deg,rgba(40,190,255,.22),rgba(160,70,255,.22));border-color:rgba(120,140,255,.45);box-shadow:0 0 22px rgba(110,110,255,.25);color:#cfd5ee}
+.cal-d.booked:after{opacity:1;transform:scale(.55);background:#7b8cff}
+.cal-d.paid{background:rgba(46,204,113,.16);border-color:rgba(46,204,113,.5);box-shadow:0 0 22px rgba(46,204,113,.22);color:#c9f2da}
+.cal-d.paid:after{opacity:1;transform:scale(1);background:#2ecc71 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%2306210f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/14px no-repeat}
+@media (max-width:860px){.cal{top:auto;bottom:3%;transform:none;left:4%;right:4%;width:auto;opacity:.6}.cal-g{gap:6px}.cal-d{border-radius:9px;padding:3px 5px;font-size:10px}}
 .hero .wrap{z-index:1}
 .chip{position:absolute;display:flex;align-items:center;gap:8px;padding:8px 13px 8px 9px;border-radius:14px;background:rgba(17,26,61,.86);border:1px solid #2b376e;box-shadow:0 10px 30px rgba(0,0,0,.35);font-size:13px;color:var(--muted);white-space:nowrap;opacity:0;transform:translateY(16px) scale(.9);transition:opacity .6s,transform 3.2s cubic-bezier(.2,.7,.2,1),border-color .4s,background .4s}
 .chip.on{opacity:1;transform:translateY(-22px) scale(1)}
@@ -81,7 +92,7 @@
 @media (prefers-reduced-motion:reduce){
   *,*:before,*:after{animation:none!important;transition:none!important}
   .js .rv,.js .rows .ticks li,.js .hero .wrap>div:first-child>*,.js .hero .device{opacity:1!important;transform:none!important}
-  .flow{display:none}
+  .cal-d.booked,.cal-d.paid{background:none}
 }
 
 /* ===== Further down the page ===== */
@@ -151,3 +162,61 @@ body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
   .js .trust .ticks li{opacity:1!important;transform:none!important}
 }
 .rows,.more{overflow-x:clip}
+
+/* ===== Quiet line drawings, one per section ===== */
+.deco{pointer-events:none;color:rgba(170,179,214,.16)}
+.deco svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.rows .copy,.trust .two>div{position:relative}
+.rows .copy>.deco,.trust .two>div>.deco{position:absolute;z-index:-1}
+.rows .copy{isolation:isolate}.trust .two>div{isolation:isolate}
+.rows .vis>.device,.rows .vis>.paper{position:relative;z-index:1}
+
+/* who still owes you: big outline total counting down */
+.deco.euro{left:-6px;top:-70px;font:800 150px/1 Poppins,sans-serif;color:transparent;-webkit-text-stroke:1px rgba(170,179,214,.13);white-space:nowrap;letter-spacing:-4px;transition:-webkit-text-stroke-color .6s}
+.deco.euro.zero{-webkit-text-stroke-color:rgba(46,204,113,.3)}
+
+/* get paid in one tap: tap ripple behind the phone */
+.deco.ripple{position:absolute;left:50%;top:50%;width:0;height:0;z-index:0}
+.deco.ripple i{position:absolute;left:-170px;top:-170px;width:340px;height:340px;border-radius:50%;border:1.5px solid rgba(40,190,255,.22);opacity:0;animation:ripple 4.5s ease-out infinite}
+.deco.ripple i:nth-child(2){animation-delay:1.5s}.deco.ripple i:nth-child(3){animation-delay:3s}
+@keyframes ripple{0%{transform:scale(.35);opacity:0}15%{opacity:1}100%{transform:scale(1.45);opacity:0}}
+
+/* chase payments: envelope gliding across */
+.deco.env{width:60px;height:42px;top:-58px;left:0;animation:glide 14s linear infinite}
+.deco.env svg{animation:flutter 3s ease-in-out infinite}
+@keyframes glide{from{transform:translateX(-80px)}to{transform:translateX(520px)}}
+@keyframes flutter{50%{transform:translateY(-8px) rotate(-4deg)}}
+
+/* invoices: lines drawing themselves */
+.deco.lines{width:150px;height:120px;right:-10px;top:-40px}
+.deco.lines path{stroke-dasharray:140;stroke-dashoffset:140;animation:draw 7s ease-in-out infinite}
+.deco.lines path:nth-child(2){animation-delay:.4s}.deco.lines path:nth-child(3){animation-delay:.8s}.deco.lines path:nth-child(4){animation-delay:1.2s}.deco.lines path:nth-child(5){animation-delay:1.8s}.deco.lines path:nth-child(6){animation-delay:2.1s}
+@keyframes draw{0%{stroke-dashoffset:140}25%,75%{stroke-dashoffset:0}100%{stroke-dashoffset:-140}}
+
+/* everything else: four tiny icons drifting */
+.more .wrap{position:relative}
+.more .wrap>*:not(.deco){position:relative;z-index:1}
+.deco.ic{position:absolute;width:30px;height:30px;z-index:0;animation:drift2 9s ease-in-out infinite}
+.deco.ic:nth-of-type(2){animation-delay:-2s}.deco.ic:nth-of-type(3){animation-delay:-4.5s}.deco.ic:nth-of-type(4){animation-delay:-6.5s}
+@keyframes drift2{50%{transform:translate(10px,-12px) rotate(6deg)}}
+
+/* data stays yours: padlock clicking shut */
+.deco.lock{width:46px;height:58px;right:4%;top:-6px}
+.deco.lock .shackle{animation:shut 5s ease-in-out infinite}
+@keyframes shut{0%,15%{transform:translateY(-7px)}30%,85%{transform:translateY(0)}100%{transform:translateY(-7px)}}
+.deco.lock.green{color:rgba(46,204,113,.3)}
+
+/* download box: arrow bouncing into a tray */
+.cta>*:not(.deco){position:relative;z-index:1}
+.deco.dl{position:absolute;z-index:0;width:54px;height:54px;right:34px;bottom:26px}
+.deco.dl .arrow{animation:dl 2.4s ease-in-out infinite}
+@keyframes dl{0%,100%{transform:translateY(-6px)}50%{transform:translateY(3px)}}
+
+@media (max-width:860px){
+  .deco.euro{font-size:92px;top:-42px;letter-spacing:-2px}
+  .deco.ripple i{left:-130px;top:-130px;width:260px;height:260px}
+  .deco.env{top:-50px}@keyframes glide{from{transform:translateX(-80px)}to{transform:translateX(360px)}}
+  .deco.lines{width:110px;height:90px;right:0;top:-30px}
+  .deco.dl{width:40px;height:40px;right:18px;top:18px;bottom:auto}
+}
+@media (prefers-reduced-motion:reduce){.deco{display:none}}

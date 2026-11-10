@@ -27,55 +27,66 @@
     jobs.classList.add('mq');
   }
 
-  // siteto.fit-style background: faint grid, dotted payment lines drawing from a € coin to a green tick
+  // ShowFee's own background: a faint diary where days light up as booked, then turn green when paid
   (function(){
     var hero = document.querySelector('.hero'); if (!hero) return;
-    var c = document.createElement('canvas'); c.className = 'flow'; c.setAttribute('aria-hidden','true'); hero.insertBefore(c, hero.firstChild);
-    if (!c.getContext) return;
-    var x = c.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1), W, H, R = [], vis = true;
-    function size(){ var r = c.getBoundingClientRect(); W = r.width; H = r.height; c.width = W*dpr; c.height = H*dpr; x.setTransform(dpr,0,0,dpr,0,0); }
-    size(); addEventListener('resize', size);
-    function rnd(a,b){ return a + Math.random()*(b-a); }
-    function make(t){
-      var narrow = W < 860, x0 = narrow ? W*.04 : W*.55, x1 = W*.96, y0 = narrow ? H*.64 : H*.08, y1 = narrow ? H*.97 : H*.92;
-      var a = {x:rnd(x0,x1), y:rnd(y0,y1)}, b, n = 0;
-      do { b = {x:rnd(x0,x1), y:rnd(y0,y1)}; n++; } while (Math.hypot(b.x-a.x, b.y-a.y) < Math.min(W,H)*.3 && n < 20);
-      var dx = b.x-a.x, dy = b.y-a.y, bend = rnd(-.45,.45);
-      var c1 = {x:a.x+dx*.25-dy*bend, y:a.y+dy*.25+dx*bend}, c2 = {x:a.x+dx*.75+dy*bend, y:a.y+dy*.75-dx*bend};
-      var pts = [], prev = a, len = 0;
-      for (var i = 0; i <= 160; i++){ var u = i/160, v = 1-u;
-        var p = {x:v*v*v*a.x+3*v*v*u*c1.x+3*v*u*u*c2.x+u*u*u*b.x, y:v*v*v*a.y+3*v*v*u*c1.y+3*v*u*u*c2.y+u*u*u*b.y};
-        len += Math.hypot(p.x-prev.x, p.y-prev.y); p.l = len; pts.push(p); prev = p; }
-      return {pts:pts, len:len, t0:t, dur:rnd(2.6,4), hold:rnd(1.6,2.4)};
+    var now = new Date(), y = now.getFullYear(), m = now.getMonth();
+    var first = (new Date(y, m, 1).getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate();
+    var cal = document.createElement('div'); cal.className = 'cal'; cal.setAttribute('aria-hidden','true');
+    var html = '<div class="cal-m">' + now.toLocaleString('en-GB', {month:'long'}) + '</div><div class="cal-g">';
+    'MTWTFSS'.split('').forEach(function(d){ html += '<span class="cal-h">' + d + '</span>'; });
+    for (var i = 0; i < 35; i++){ var n = i - first + 1; html += '<span class="cal-d' + (n === now.getDate() ? ' today' : '') + '">' + (n >= 1 && n <= days ? n : '') + '</span>'; }
+    cal.innerHTML = html + '</div>'; hero.insertBefore(cal, hero.firstChild);
+    var cells = [].slice.call(cal.querySelectorAll('.cal-d')).filter(function(c){ return c.textContent; }), vis = true;
+    if ('IntersectionObserver' in window) new IntersectionObserver(function(e){ vis = e[0].isIntersecting; }).observe(hero);
+    function step(){
+      if (!vis || document.hidden) return;
+      var free = cells.filter(function(c){ return !c.className.match(/booked|paid/); });
+      if (cal.querySelectorAll('.booked,.paid').length >= 7 || !free.length) return;
+      var c = free[Math.floor(Math.random() * free.length)];
+      c.classList.add('booked');
+      setTimeout(function(){ c.classList.remove('booked'); c.classList.add('paid'); }, 1800 + Math.random() * 1200);
+      setTimeout(function(){ c.classList.remove('paid'); }, 6500 + Math.random() * 2500);
     }
-    function at(r,d){ var p = r.pts; for (var i = 1; i < p.length; i++) if (p[i].l >= d) return p[i]; return p[p.length-1]; }
-    function coin(px,py,al){ x.globalAlpha = al; x.strokeStyle = '#28beff'; x.lineWidth = 2; x.fillStyle = '#0b1433';
-      x.beginPath(); x.arc(px,py,10,0,7); x.fill(); x.stroke();
-      x.fillStyle = '#28beff'; x.font = '700 11px Poppins,sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('€',px,py+.5); }
-    function tick(px,py,al,sc){ x.globalAlpha = al; x.fillStyle = '#2ecc71'; x.beginPath(); x.arc(px,py,11*sc,0,7); x.fill();
-      x.strokeStyle = '#06210f'; x.lineWidth = 2.6; x.lineCap = 'round'; x.lineJoin = 'round';
-      x.beginPath(); x.moveTo(px-5*sc,py); x.lineTo(px-1.5*sc,py+3.6*sc); x.lineTo(px+5*sc,py-3.6*sc); x.stroke(); }
-    function grid(){ x.globalAlpha = .06; x.strokeStyle = '#ffffff'; x.lineWidth = 1; var g = 56; x.beginPath();
-      for (var gx = W%g/2; gx < W; gx += g){ x.moveTo(gx,0); x.lineTo(gx,H); } for (var gy = 0; gy < H; gy += g){ x.moveTo(0,gy); x.lineTo(W,gy); } x.stroke(); }
-    function frame(now){
-      var t = now/1000; x.clearRect(0,0,W,H); grid();
-      var want = W < 860 ? 2 : 5; while (R.length < want) R.push(make(t - rnd(0,.4)));
-      for (var k = R.length-1; k >= 0; k--){
-        var r = R[k], e = t-r.t0, p = Math.min(1, e/r.dur), fade = Math.max(0, Math.min(1, 1-(e-r.dur-r.hold)/.8));
-        if (fade <= 0){ R.splice(k,1); continue; }
-        var d = r.len*(1-Math.pow(1-p,3));
-        for (var s = 0; s < d; s += 14){ var q = at(r,s); x.globalAlpha = .55*fade; x.fillStyle = s < d-50 ? '#8f6bff' : '#28beff'; x.beginPath(); x.arc(q.x,q.y,2.3,0,7); x.fill(); }
-        coin(r.pts[0].x, r.pts[0].y, fade*.9);
-        if (p < 1){ var h = at(r,d); x.globalAlpha = fade; x.fillStyle = '#28beff'; x.shadowColor = '#28beff'; x.shadowBlur = 14; x.beginPath(); x.arc(h.x,h.y,4,0,7); x.fill(); x.shadowBlur = 0; }
-        else { var b = r.pts[r.pts.length-1], pop = Math.min(1,(e-r.dur)/.35); tick(b.x, b.y, fade*.9, pop < 1 ? .6+.55*Math.sin(pop*Math.PI/2) : 1); }
-      }
-      x.globalAlpha = 1; if (vis) requestAnimationFrame(frame);
-    }
-    if ('IntersectionObserver' in window) new IntersectionObserver(function(e){ var was = vis; vis = e[0].isIntersecting; if (vis && !was) requestAnimationFrame(frame); }).observe(hero);
-    requestAnimationFrame(frame);
+    step(); setTimeout(step, 400); setTimeout(step, 900); setInterval(step, 1100);
   })();
 
   // ===== Further down the page =====
+
+  // quiet line drawings, one per section
+  (function(){
+    function el(parent, cls, html){ if (!parent) return null; var d = document.createElement('div'); d.className = 'deco ' + cls; d.setAttribute('aria-hidden','true'); d.innerHTML = html || ''; parent.appendChild(d); return d; }
+    var svg = function(vb, inner){ return '<svg viewBox="' + vb + '">' + inner + '</svg>'; };
+    var rows = document.querySelectorAll('.rows .row');
+    // 1. €1,450 counting down to €0
+    var eu = el(rows[0] && rows[0].querySelector('.copy'), 'euro', '€1,450');
+    if (eu) {
+      var on = false, t0 = 0;
+      new IntersectionObserver(function(e){ var was = on; on = e[0].isIntersecting; if (on && !was){ t0 = performance.now(); requestAnimationFrame(tick); } }).observe(eu.parentNode);
+      function tick(now){
+        var e = (now - t0) / 1000, cyc = e % 10, p = Math.min(1, cyc / 5.5), v = Math.round(1450 * (1 - (1 - Math.pow(1 - p, 3))) / 10) * 10;
+        eu.textContent = '€' + v.toLocaleString('en-GB'); eu.classList.toggle('zero', v === 0);
+        if (on) requestAnimationFrame(tick);
+      }
+    }
+    // 2. tap ripple behind the phone
+    el(rows[1] && rows[1].querySelector('.vis'), 'ripple', '<i></i><i></i><i></i>');
+    // 3. envelope gliding
+    el(rows[2] && rows[2].querySelector('.copy'), 'env', svg('0 0 60 42', '<rect x="2" y="2" width="56" height="38" rx="5"/><path d="M3 5l27 19L57 5"/>'));
+    // 4. invoice lines drawing themselves
+    el(rows[3] && rows[3].querySelector('.copy'), 'lines', svg('0 0 150 120', '<path d="M10 14h70"/><path d="M10 34h130"/><path d="M10 52h130"/><path d="M10 70h100"/><path d="M80 96h60"/><path d="M80 104h60"/>'));
+    // 5. four tiny icons for the four cards
+    var mw = document.querySelector('.more .wrap'), icons = [
+      svg('0 0 30 30', '<rect x="4" y="6" width="22" height="20" rx="3"/><path d="M4 12h22M10 3v6M20 3v6"/>'),
+      svg('0 0 30 30', '<path d="M5 25V15M12 25V9M19 25v-8M26 25V5"/>'),
+      svg('0 0 30 30', '<circle cx="15" cy="10" r="5"/><path d="M5 27c1-6 5-9 10-9s9 3 10 9"/>'),
+      svg('0 0 30 30', '<path d="M21 4a11 11 0 1 0 5 15A9 9 0 0 1 21 4z"/>')], pos = [['56%','-6px'],['68%','26px'],['80%','-2px'],['91%','30px']];
+    if (mw) icons.forEach(function(s, i){ var d = el(mw, 'ic', s); d.style.left = pos[i][0]; d.style.top = pos[i][1]; });
+    // 6. padlock clicking shut
+    var lk = el(document.querySelector('.trust .two>div'), 'lock', svg('0 0 46 58', '<path class="shackle" d="M12 26V16a11 11 0 0 1 22 0v10"/><rect x="5" y="26" width="36" height="28" rx="6"/><path d="M23 37v7"/>'));
+    // 7. download arrow
+    el(document.querySelector('.cta'), 'dl', svg('0 0 54 54', '<g class="arrow"><path d="M27 6v26"/><path d="M17 23l10 10 10-10"/></g><path d="M8 38v8h38v-8"/>'));
+  })();
 
   // screenshots in "everything else": how far each one can scroll
   function pans(){ document.querySelectorAll('.more .crop').forEach(function(cr){ var im = cr.querySelector('img'); if (!im) return;
