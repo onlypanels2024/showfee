@@ -53,40 +53,34 @@
 
   // ===== Further down the page =====
 
-  // quiet line drawings, one per section
+  // follows the mouse: soft glow + a dot grid that shows up around the pointer; diary days and buttons react too
   (function(){
-    function el(parent, cls, html){ if (!parent) return null; var d = document.createElement('div'); d.className = 'deco ' + cls; d.setAttribute('aria-hidden','true'); d.innerHTML = html || ''; parent.appendChild(d); return d; }
-    var svg = function(vb, inner){ return '<svg viewBox="' + vb + '">' + inner + '</svg>'; };
-    var rows = document.querySelectorAll('.rows .row');
-    // 1. €1,450 counting down to €0
-    var eu = el(rows[0] && rows[0].querySelector('.copy'), 'euro', '€1,450');
-    if (eu) {
-      var on = false, t0 = 0;
-      new IntersectionObserver(function(e){ var was = on; on = e[0].isIntersecting; if (on && !was){ t0 = performance.now(); requestAnimationFrame(tick); } }).observe(eu.parentNode);
-      function tick(now){
-        var e = (now - t0) / 1000, cyc = e % 10, p = Math.min(1, cyc / 5.5), v = Math.round(1450 * (1 - (1 - Math.pow(1 - p, 3))) / 10) * 10;
-        eu.textContent = '€' + v.toLocaleString('en-GB'); eu.classList.toggle('zero', v === 0);
-        if (on) requestAnimationFrame(tick);
+    var root = document.documentElement, fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+    var dots = document.createElement('div'); dots.className = 'dots'; dots.setAttribute('aria-hidden','true');
+    var glow = document.createElement('div'); glow.className = 'glow'; glow.setAttribute('aria-hidden','true');
+    document.body.insertBefore(glow, document.body.firstChild); document.body.insertBefore(dots, document.body.firstChild);
+    var tx = innerWidth * .7, ty = innerHeight * .35, x = tx, y = ty, active = !fine;
+    if (fine) addEventListener('pointermove', function(e){ tx = e.clientX; ty = e.clientY; if (!active){ active = true; root.classList.add('m-on'); } }, {passive:true});
+    else root.classList.add('m-on');
+    document.addEventListener('mouseleave', function(){ root.classList.remove('m-on'); active = false; });
+    var cells = [].slice.call(document.querySelectorAll('.cal-d')), mags = [].slice.call(document.querySelectorAll('.btn.play, nav a.nav-get'));
+    function loop(t){
+      if (!fine){ tx = innerWidth * (.5 + .38 * Math.sin(t / 5200)); ty = innerHeight * (.45 + .3 * Math.sin(t / 3900)); }
+      x += (tx - x) * .12; y += (ty - y) * .12;
+      root.style.setProperty('--mx', x.toFixed(1) + 'px'); root.style.setProperty('--my', y.toFixed(1) + 'px');
+      if (fine && active) {
+        cells.forEach(function(c){ var r = c.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+          var d = Math.hypot(r.left + r.width / 2 - x, r.top + r.height / 2 - y), p = Math.max(0, 1 - d / 190);
+          c.style.setProperty('--p', p.toFixed(2)); });
       }
+      requestAnimationFrame(loop);
     }
-    // 2. tap ripple behind the phone
-    el(rows[1] && rows[1].querySelector('.vis'), 'ripple', '<i></i><i></i><i></i>');
-    // 3. envelope gliding
-    el(rows[2] && rows[2].querySelector('.copy'), 'env', svg('0 0 60 42', '<rect x="2" y="2" width="56" height="38" rx="5"/><path d="M3 5l27 19L57 5"/>'));
-    // 4. invoice lines drawing themselves
-    el(rows[3] && rows[3].querySelector('.copy'), 'lines', svg('0 0 96 58', '<path d="M2 4h40"/><path d="M2 16h92"/><path d="M2 27h92"/><path d="M2 38h66"/><path d="M52 50h42"/><path d="M52 56h42"/>'));
-    document.querySelectorAll('.rows .copy').forEach(function(cp){ if (cp.querySelector('.deco')) cp.classList.add('has-deco'); });
-    // 5. four tiny icons for the four cards
-    var mw = document.querySelector('.more .wrap'), icons = [
-      svg('0 0 30 30', '<rect x="4" y="6" width="22" height="20" rx="3"/><path d="M4 12h22M10 3v6M20 3v6"/>'),
-      svg('0 0 30 30', '<path d="M5 25V15M12 25V9M19 25v-8M26 25V5"/>'),
-      svg('0 0 30 30', '<circle cx="15" cy="10" r="5"/><path d="M5 27c1-6 5-9 10-9s9 3 10 9"/>'),
-      svg('0 0 30 30', '<path d="M21 4a11 11 0 1 0 5 15A9 9 0 0 1 21 4z"/>')], pos = [['56%','-6px'],['68%','26px'],['80%','-2px'],['91%','30px']];
-    if (mw) icons.forEach(function(s, i){ var d = el(mw, 'ic', s); d.style.left = pos[i][0]; d.style.top = pos[i][1]; });
-    // 6. padlock clicking shut
-    var lk = el(document.querySelector('.trust .two>div'), 'lock', svg('0 0 46 58', '<path class="shackle" d="M12 26V16a11 11 0 0 1 22 0v10"/><rect x="5" y="26" width="36" height="28" rx="6"/><path d="M23 37v7"/>'));
-    // 7. download arrow
-    el(document.querySelector('.cta'), 'dl', svg('0 0 54 54', '<g class="arrow"><path d="M27 6v26"/><path d="M17 23l10 10 10-10"/></g><path d="M8 38v8h38v-8"/>'));
+    requestAnimationFrame(loop);
+    if (fine) mags.forEach(function(b){
+      b.addEventListener('pointermove', function(e){ var r = b.getBoundingClientRect();
+        b.style.transform = 'translate(' + ((e.clientX - r.left - r.width / 2) * .18).toFixed(1) + 'px,' + ((e.clientY - r.top - r.height / 2) * .3).toFixed(1) + 'px)'; });
+      b.addEventListener('pointerleave', function(){ b.style.transform = ''; });
+    });
   })();
 
   // screenshots in "everything else": how far each one can scroll

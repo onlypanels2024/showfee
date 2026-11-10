@@ -163,60 +163,16 @@ body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 }
 .rows,.more{overflow-x:clip}
 
-/* ===== Quiet line drawings, one per section ===== */
-.deco{pointer-events:none;color:rgba(120,170,255,.5)}
-.deco svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.rows .copy,.trust .two>div{position:relative}
-.rows .copy>.deco,.trust .two>div>.deco{position:absolute;z-index:-1}
-.rows .copy{isolation:isolate}.trust .two>div{isolation:isolate}
-.rows .vis>.device,.rows .vis>.paper{position:relative;z-index:1}
-
-/* who still owes you: big outline total counting down */
-.deco.euro{left:0;top:0;font:800 60px/1 Poppins,sans-serif;color:transparent;-webkit-text-stroke:1.5px rgba(120,170,255,.38);white-space:nowrap;letter-spacing:-1px;transition:-webkit-text-stroke-color .6s}
-.deco.euro.zero{-webkit-text-stroke-color:rgba(46,204,113,.6)}
-
-/* get paid in one tap: tap ripple behind the phone */
-.deco.ripple{position:absolute;left:50%;top:50%;width:0;height:0;z-index:0}
-.deco.ripple i{position:absolute;left:-170px;top:-170px;width:340px;height:340px;border-radius:50%;border:2px solid rgba(40,190,255,.5);opacity:0;animation:ripple 4.5s ease-out infinite}
-.deco.ripple i:nth-child(2){animation-delay:1.5s}.deco.ripple i:nth-child(3){animation-delay:3s}
-@keyframes ripple{0%{transform:scale(.35);opacity:0}15%{opacity:1}100%{transform:scale(1.45);opacity:0}}
-
-/* chase payments: envelope gliding across */
-.deco.env{width:70px;height:50px;top:4px;left:0;animation:glide 14s linear infinite}
-.deco.env svg{animation:flutter 3s ease-in-out infinite}
-@keyframes glide{from{transform:translateX(-80px)}to{transform:translateX(520px)}}
-@keyframes flutter{50%{transform:translateY(-8px) rotate(-4deg)}}
-
-/* invoices: lines drawing themselves */
-.deco.lines{width:96px;height:58px;left:0;top:2px}
-.deco.lines path{stroke-dasharray:100;stroke-dashoffset:100;animation:draw 7s ease-in-out infinite}
-.deco.lines path:nth-child(2){animation-delay:.4s}.deco.lines path:nth-child(3){animation-delay:.8s}.deco.lines path:nth-child(4){animation-delay:1.2s}.deco.lines path:nth-child(5){animation-delay:1.8s}.deco.lines path:nth-child(6){animation-delay:2.1s}
-@keyframes draw{0%{stroke-dashoffset:100}25%,75%{stroke-dashoffset:0}100%{stroke-dashoffset:-100}}
-
-/* everything else: four tiny icons drifting */
-.more .wrap{position:relative}
-.more .wrap>*:not(.deco){position:relative;z-index:1}
-.deco.ic{position:absolute;width:38px;height:38px;z-index:0;animation:drift2 9s ease-in-out infinite}
-.deco.ic:nth-of-type(2){animation-delay:-2s}.deco.ic:nth-of-type(3){animation-delay:-4.5s}.deco.ic:nth-of-type(4){animation-delay:-6.5s}
-@keyframes drift2{50%{transform:translate(10px,-12px) rotate(6deg)}}
-
-/* data stays yours: padlock clicking shut */
-.deco.lock{width:52px;height:66px;right:4%;top:-6px}
-.deco.lock .shackle{animation:shut 5s ease-in-out infinite}
-@keyframes shut{0%,15%{transform:translateY(-7px)}30%,85%{transform:translateY(0)}100%{transform:translateY(-7px)}}
-.deco.lock.green{color:rgba(46,204,113,.3)}
-
-/* download box: arrow bouncing into a tray */
-.cta>*:not(.deco){position:relative;z-index:1}
-.deco.dl{position:absolute;z-index:0;width:64px;height:64px;right:34px;bottom:26px}
-.deco.dl .arrow{animation:dl 2.4s ease-in-out infinite}
-@keyframes dl{0%,100%{transform:translateY(-6px)}50%{transform:translateY(3px)}}
-
-@media (max-width:860px){
-  .deco.ripple i{left:-130px;top:-130px;width:260px;height:260px}
-@keyframes glide{from{transform:translateX(-80px)}to{transform:translateX(360px)}}
-  .deco.dl{width:40px;height:40px;right:18px;top:18px;bottom:auto}
-}
-@media (prefers-reduced-motion:reduce){.deco{display:none}}
-
-.rows .copy.has-deco{padding-top:76px}
+/* ===== Follows the mouse ===== */
+.dots,.glow{position:fixed;inset:0;pointer-events:none;z-index:-1}
+.dots{background-image:radial-gradient(rgba(170,190,255,.8) 1.1px,transparent 1.6px);background-size:26px 26px;opacity:0;transition:opacity .6s;
+  -webkit-mask-image:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),#000 0%,rgba(0,0,0,.35) 45%,transparent 75%);mask-image:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),#000 0%,rgba(0,0,0,.35) 45%,transparent 75%)}
+.glow{background:radial-gradient(520px circle at var(--mx,50%) var(--my,50%),rgba(90,120,255,.14),rgba(160,70,255,.06) 40%,transparent 70%);opacity:0;transition:opacity .6s}
+.m-on .dots{opacity:.8}.m-on .glow{opacity:1}
+@media (hover:none){.m-on .dots{opacity:.25}.m-on .glow{opacity:.7}}
+/* diary days light up near the pointer */
+.cal-d{border-color:rgba(130,150,255,calc(.05 + var(--p,0) * .5));background:rgba(110,130,255,calc(.015 + var(--p,0) * .1));color:rgba(200,210,255,calc(.28 + var(--p,0) * .6))}
+.cal-d.booked,.cal-d.paid{color:#cfd5ee}
+/* buttons drift towards the pointer */
+.btn.play,nav a.nav-get{transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .2s}
+@media (prefers-reduced-motion:reduce){.dots,.glow{display:none}}
