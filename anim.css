@@ -1,0 +1,153 @@
+/* ===== ShowFee animations (all switched off for people who ask their phone for less motion) ===== */
+
+/* hero entrance */
+.js .hero .wrap>div:first-child>*{opacity:0;transform:translateY(22px);animation:up .8s cubic-bezier(.2,.7,.2,1) forwards}
+.js .hero .wrap>div:first-child>*:nth-child(1){animation-delay:.05s}
+.js .hero .wrap>div:first-child>*:nth-child(2){animation-delay:.18s}
+.js .hero .wrap>div:first-child>*:nth-child(3){animation-delay:.32s}
+.js .hero .wrap>div:first-child>*:nth-child(4){animation-delay:.46s}
+.js .hero .device{opacity:0;animation:phoneIn 1s .35s cubic-bezier(.2,.7,.2,1) forwards,bob 7s 1.4s ease-in-out infinite}
+@keyframes up{to{opacity:1;transform:none}}
+@keyframes phoneIn{from{opacity:0;transform:translateY(40px) rotate(4deg) scale(.94)}to{opacity:1;transform:none}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* shimmering words in the headline */
+.shine{background:linear-gradient(110deg,var(--c1) 0%,var(--c2) 40%,#fff 50%,var(--c2) 60%,var(--c1) 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite}
+@keyframes shine{from{background-position:100% 0}to{background-position:-150% 0}}
+
+/* glowing background blobs drift slowly */
+.hero:before{animation:drift 14s ease-in-out infinite alternate}
+.hero:after{animation:drift 18s ease-in-out infinite alternate-reverse}
+@keyframes drift{to{transform:translate(-60px,50px) scale(1.12)}}
+
+/* "Coming soon" dot pulses */
+.badge .dot{box-shadow:0 0 0 0 rgba(40,190,255,.6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 10px rgba(40,190,255,0)}100%{box-shadow:0 0 0 0 rgba(40,190,255,0)}}
+
+/* floating booking cards that turn from Owed to Paid */
+.fx{position:absolute;inset:0;pointer-events:none;z-index:0}
+.hero .wrap{z-index:1}
+.chip{position:absolute;display:flex;align-items:center;gap:8px;padding:8px 13px 8px 9px;border-radius:14px;background:rgba(17,26,61,.86);border:1px solid #2b376e;box-shadow:0 10px 30px rgba(0,0,0,.35);font-size:13px;color:var(--muted);white-space:nowrap;opacity:0;transform:translateY(16px) scale(.9);transition:opacity .6s,transform 3.2s cubic-bezier(.2,.7,.2,1),border-color .4s,background .4s}
+.chip.on{opacity:1;transform:translateY(-22px) scale(1)}
+.chip.off{opacity:0;transform:translateY(-46px) scale(.96);transition:opacity .8s,transform 1s}
+.chip b{color:var(--text);font-weight:600}
+.chip i{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:700;background:#3a2a10;color:#ffb547;transition:background .3s,color .3s,transform .3s}
+.chip .st{font-weight:600;color:#ffb547;transition:color .3s}
+.chip.paid{border-color:rgba(46,204,113,.55);background:rgba(14,40,38,.9)}
+.chip.paid i{background:#2ecc71;color:#06210f;animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+.chip.paid .st{color:#2ecc71}
+@keyframes pop{0%{transform:scale(.4)}100%{transform:scale(1)}}
+
+/* push notification sliding onto the hero phone */
+.hero .device{position:relative}
+.note{position:absolute;left:14px;right:14px;top:16px;z-index:2;display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:16px;background:rgba(245,247,255,.96);color:#141a33;font-size:12.5px;line-height:1.35;box-shadow:0 12px 30px rgba(0,0,0,.4);opacity:0;transform:translateY(-24px) scale(.96);transition:opacity .45s,transform .55s cubic-bezier(.2,1.3,.4,1)}
+.note.on{opacity:1;transform:none}
+.note img{width:30px;height:30px;border-radius:8px;flex:none}
+.note b{display:block;font-size:12px;color:#5a6290;font-weight:600}
+
+/* job names scroll past */
+.jobs.mq{flex-wrap:nowrap;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.jobs.mq .lane{display:flex;gap:10px;flex:none;padding-right:10px;animation:mq 40s linear infinite}
+.jobs.mq:hover .lane{animation-play-state:paused}
+.jobs.mq span{flex:none}
+@keyframes mq{to{transform:translateX(-100%)}}
+
+/* sections slide in as you scroll */
+.js .rv{opacity:0;transform:translateY(34px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+.js .rv.from-r{transform:translateX(50px) rotate(2deg)}
+.js .rv.from-l{transform:translateX(-50px) rotate(-2deg)}
+.js .rv.in{opacity:1;transform:none}
+.js .rows .ticks li{opacity:0;transform:translateX(-14px);transition:opacity .5s,transform .5s}
+.js .rows .in .ticks li{opacity:1;transform:none}
+.js .rows .in .ticks li:nth-child(2){transition-delay:.15s}
+.js .rows .in .ticks li:nth-child(3){transition-delay:.3s}
+.js .rows .ticks li:before{transform:scale(0);transition:transform .4s cubic-bezier(.3,1.6,.5,1) .2s}
+.js .rows .in .ticks li:before{transform:scale(1)}
+
+/* phones tilt towards the mouse; cards lift on hover */
+.rows .device{transition:transform .25s ease-out;will-change:transform}
+.more figure{transition:transform .3s}
+.more figure:hover{transform:translateY(-6px)}
+.paper{transition:transform .4s}
+.paper:hover{transform:rotate(0) scale(1.03)}
+
+/* buttons: lift and a light sweep */
+.btn{position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(120,90,255,.4)}
+.btn:after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg)}
+.btn:hover:after{left:130%;transition:left .7s}
+
+@media (max-width:860px){.chip{font-size:12px}.fx{z-index:2}}
+@media (prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation:none!important;transition:none!important}
+  .js .rv,.js .rows .ticks li,.js .hero .wrap>div:first-child>*,.js .hero .device{opacity:1!important;transform:none!important}
+  .fx,.note{display:none}
+}
+
+/* ===== Further down the page ===== */
+
+/* Google Play buttons */
+.btn.play{display:inline-flex;align-items:center;gap:10px}
+.btn.play svg{width:18px;height:18px;fill:currentColor}
+nav a.nav-get{color:#fff;background:var(--grad);padding:8px 14px;border-radius:12px;font-weight:600}
+nav a.nav-get:hover{color:#fff}
+
+/* slow aurora behind the whole page */
+body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(closest-side,rgba(40,190,255,.08),transparent) 0 0/70vmax 70vmax no-repeat,radial-gradient(closest-side,rgba(160,70,255,.1),transparent) 100% 100%/70vmax 70vmax no-repeat;animation:aurora 26s ease-in-out infinite alternate}
+@keyframes aurora{50%{background-position:60% 10%,20% 80%}100%{background-position:10% 90%,90% 20%}}
+
+/* cards that float beside the phones in each section */
+.rows .vis{position:relative}
+.side{position:absolute;z-index:3;pointer-events:none}
+.side .chip{position:static;opacity:0}
+.side .chip.on{opacity:1;transform:translateY(-8px) scale(1)}
+.side .chip.off{opacity:0;transform:translateY(-26px) scale(.96)}
+.chip.late i{background:#3d1a1a;color:#ff6b6b}.chip.late .st{color:#ff6b6b}
+.chip.blue i{background:#13305a;color:#5ab8ff}.chip.blue .st{color:#5ab8ff}
+
+/* the phones in each section float gently */
+.rows .vis>.device{animation:bob 8s ease-in-out infinite}
+.rows .row:nth-child(2) .vis>.device{animation-delay:-2s}
+.rows .row:nth-child(3) .vis>.device{animation-delay:-4s}
+.rows .device:hover{animation:none}
+
+/* PAID stamp thumps onto the invoice */
+.paper{position:relative}
+.stamp{position:absolute;right:9%;top:30%;padding:6px 16px;border:4px solid #1fa463;color:#1fa463;border-radius:10px;font:900 30px/1 Poppins,sans-serif;letter-spacing:3px;background:rgba(255,255,255,.75);opacity:0;transform:rotate(-14deg) scale(2.3);pointer-events:none}
+.stamp.go{animation:stamp 5.5s cubic-bezier(.3,1.4,.5,1) infinite}
+@keyframes stamp{0%{opacity:0;transform:rotate(-14deg) scale(2.3)}8%{opacity:1;transform:rotate(-14deg) scale(1)}10%{transform:rotate(-14deg) scale(1.06)}12%,80%{opacity:1;transform:rotate(-14deg) scale(1)}92%,100%{opacity:0;transform:rotate(-14deg) scale(1)}}
+.paper.thud{animation:thud .35s}
+@keyframes thud{40%{transform:rotate(-1.5deg) scale(.985)}}
+
+/* screenshots in "everything else" scroll slowly up and down */
+.more .crop img{animation:pan 16s ease-in-out infinite alternate}
+.more figure:nth-child(2) .crop img{animation-delay:-4s}
+.more figure:nth-child(3) .crop img{animation-delay:-8s}
+.more figure:nth-child(4) .crop img{animation-delay:-12s}
+@keyframes pan{0%,12%{transform:translateY(0)}88%,100%{transform:translateY(var(--pan,0px))}}
+
+/* headings get an underline that draws itself */
+.more h2,.trust h2,.cta h2{position:relative}
+.js .more h2:after,.js .trust h2:after{content:"";display:block;height:3px;width:64px;margin-top:10px;border-radius:3px;background:var(--grad);transform:scaleX(0);transform-origin:left;transition:transform .9s .3s cubic-bezier(.2,.7,.2,1)}
+.js .more h2.in:after,.js .trust .in h2:after{transform:scaleX(1)}
+.js .trust .ticks li{opacity:0;transform:translateX(-14px);transition:opacity .5s,transform .5s}
+.js .trust .in .ticks li{opacity:1;transform:none}
+.js .trust .in .ticks li:nth-child(2){transition-delay:.2s}.js .trust .in .ticks li:nth-child(3){transition-delay:.4s}
+.js .trust .ticks li:before{transform:scale(0);transition:transform .4s cubic-bezier(.3,1.6,.5,1) .25s}
+.js .trust .in .ticks li:before{transform:scale(1)}
+.sign:before{content:"";display:inline-block;width:0;height:2px;background:var(--grad);vertical-align:middle;margin-right:10px;transition:width 1s .6s}
+.js .trust .in .sign:before{width:36px}
+
+/* glowing border running round the download box */
+.cta{position:relative;overflow:hidden;isolation:isolate;border-color:transparent}
+.cta:before{content:"";position:absolute;inset:-60%;z-index:-2;background:conic-gradient(from 0deg,transparent 0 60%,var(--c1) 75%,var(--c2) 88%,transparent 100%);animation:spin 7s linear infinite}
+.cta:after{content:"";position:absolute;inset:2px;z-index:-1;border-radius:26px;background:linear-gradient(120deg,#0b1a3a,#1a1040)}
+@keyframes spin{to{transform:rotate(1turn)}}
+.cta .btn.play{animation:breathe 3s ease-in-out infinite}
+@keyframes breathe{50%{box-shadow:0 0 0 8px rgba(120,90,255,.18),0 10px 30px rgba(120,90,255,.35)}}
+
+@media (prefers-reduced-motion:reduce){
+  body:before,.side,.stamp{display:none}
+  .js .trust .ticks li{opacity:1!important;transform:none!important}
+}
+.rows,.more{overflow-x:clip}
