@@ -71,6 +71,53 @@
     setTimeout(show, 1800); setInterval(show, 5000);
   }
 
+  // ===== Further down the page =====
+
+  // cards that float beside the phone in each section, flipping when "paid"
+  var rowSets = [
+    {cls:'', items:[['Radisson Blu','€400','Overdue','late'],['Joanna & Mark','€900','Owed'],['Bob\'s Bar','€150','Owed']], done:'Paid'},
+    {cls:'blue', items:[['PayPal','€300','Link sent'],['Revolut','€120','Link sent'],['Stripe','€450','Link sent']], done:'Paid'},
+    {cls:'late', items:[['Bob\'s Bar','7 days late','Late'],['Radisson Blu','12 days late','Late']], done:'Reminder sent'},
+    {cls:'blue', items:[['Invoice #024','€450','Creating PDF'],['Invoice #025','€300','Creating PDF']], done:'Sent'}
+  ];
+  document.querySelectorAll('.rows .row').forEach(function(row, ri){
+    var vis = row.querySelector('.vis'), dev = vis.firstElementChild, set = rowSets[ri]; if (!set) return;
+    var on = false, i = 0, side = 0;
+    new IntersectionObserver(function(e){ on = e[0].isIntersecting; }, {threshold:.25}).observe(vis);
+    function spawn(){
+      if (!on || document.hidden) return;
+      var it = set.items[i++ % set.items.length], s = document.createElement('div'); s.className = 'side';
+      var cls = it[3] || set.cls;
+      s.innerHTML = '<div class="chip '+cls+'"><i>'+(cls==='late'?'!':'€')+'</i><span><b>'+it[0]+'</b> · '+it[1]+'</span><span class="st">'+it[2]+'</span></div>';
+      vis.appendChild(s);
+      var c = s.firstChild, vr = vis.getBoundingClientRect(), dr = dev.getBoundingClientRect(), w = c.offsetWidth, h = c.offsetHeight;
+      var left = (side++ % 2 === 0) ? dr.left - vr.left - w * .55 : dr.right - vr.left - w * .45;
+      var top = dr.top - vr.top + dr.height * (.18 + Math.random() * .6);
+      var pageLeft = vr.left + left; if (pageLeft < 8) left += 8 - pageLeft; if (vr.left + left + w > innerWidth - 8) left -= vr.left + left + w - innerWidth + 8;
+      s.style.left = left + 'px'; s.style.top = top + 'px';
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ c.classList.add('on'); }); });
+      setTimeout(function(){ c.classList.remove('late','blue'); c.classList.add('paid'); c.querySelector('i').textContent = '✓'; c.querySelector('.st').textContent = set.done; }, 1600);
+      setTimeout(function(){ c.classList.add('off'); }, 4000);
+      setTimeout(function(){ s.remove(); }, 5200);
+    }
+    setInterval(spawn, 2600 + ri * 150);
+  });
+
+  // PAID stamp on the invoice
+  var paper = document.querySelector('.rows .paper');
+  if (paper) {
+    var st = document.createElement('div'); st.className = 'stamp'; st.textContent = 'PAID'; st.setAttribute('aria-hidden','true'); paper.appendChild(st);
+    new IntersectionObserver(function(e){ st.classList.toggle('go', e[0].isIntersecting); }, {threshold:.4}).observe(paper);
+    st.addEventListener('animationiteration', function(){ setTimeout(function(){ paper.classList.remove('thud'); void paper.offsetWidth; paper.classList.add('thud'); }, 400); });
+    setTimeout(function(){ paper.classList.add('thud'); }, 0);
+  }
+
+  // screenshots in "everything else": how far each one can scroll
+  function pans(){ document.querySelectorAll('.more .crop').forEach(function(cr){ var im = cr.querySelector('img'); if (!im) return;
+    var d = im.offsetHeight - cr.clientHeight + 8; im.style.setProperty('--pan', (d > 0 ? -d : 0) + 'px'); }); }
+  document.querySelectorAll('.more .crop img').forEach(function(im){ if (im.complete) pans(); else im.addEventListener('load', pans); });
+  addEventListener('resize', pans);
+
   // phones tilt towards the mouse (computers only)
   if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
     document.querySelectorAll('.rows .device').forEach(function(d){
