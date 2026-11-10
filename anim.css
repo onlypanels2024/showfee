@@ -25,7 +25,7 @@
 @keyframes pulse{70%{box-shadow:0 0 0 10px rgba(40,190,255,0)}100%{box-shadow:0 0 0 0 rgba(40,190,255,0)}}
 
 /* floating booking cards that turn from Owed to Paid */
-.fx{position:absolute;inset:0;pointer-events:none;z-index:0}
+.flow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 .hero .wrap{z-index:1}
 .chip{position:absolute;display:flex;align-items:center;gap:8px;padding:8px 13px 8px 9px;border-radius:14px;background:rgba(17,26,61,.86);border:1px solid #2b376e;box-shadow:0 10px 30px rgba(0,0,0,.35);font-size:13px;color:var(--muted);white-space:nowrap;opacity:0;transform:translateY(16px) scale(.9);transition:opacity .6s,transform 3.2s cubic-bezier(.2,.7,.2,1),border-color .4s,background .4s}
 .chip.on{opacity:1;transform:translateY(-22px) scale(1)}
@@ -77,11 +77,11 @@
 .btn:after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg)}
 .btn:hover:after{left:130%;transition:left .7s}
 
-@media (max-width:860px){.chip{font-size:12px}.fx{z-index:2}}
+
 @media (prefers-reduced-motion:reduce){
   *,*:before,*:after{animation:none!important;transition:none!important}
   .js .rv,.js .rows .ticks li,.js .hero .wrap>div:first-child>*,.js .hero .device{opacity:1!important;transform:none!important}
-  .fx,.note{display:none}
+  .flow{display:none}
 }
 
 /* ===== Further down the page ===== */
@@ -147,7 +147,7 @@ body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 @keyframes breathe{50%{box-shadow:0 0 0 8px rgba(120,90,255,.18),0 10px 30px rgba(120,90,255,.35)}}
 
 @media (prefers-reduced-motion:reduce){
-  body:before,.side,.stamp{display:none}
+  body:before{display:none}
   .js .trust .ticks li{opacity:1!important;transform:none!important}
 }
 .rows,.more{overflow-x:clip}

@@ -27,90 +27,55 @@
     jobs.classList.add('mq');
   }
 
-  // floating booking cards: Owed -> Paid
-  var hero = document.querySelector('.hero');
-  var items = [['Wedding','€450'],['DJ set','€300'],['Photo shoot','€220'],['PT session','€40'],['Tutoring','€35'],['Make-up','€90'],['Corporate gig','€600'],['Dog walking','€25'],['Hair & styling','€120'],['Birthday party','€250']];
-  var fx = document.createElement('div'); fx.className = 'fx'; fx.setAttribute('aria-hidden','true'); hero.insertBefore(fx, hero.firstChild);
-  var n = 0, visible = true, spots = [];
-  function spot(){
-    var W = hero.clientWidth, H = hero.clientHeight, narrow = W < 860, x, y, tries = 0;
-    do {
-      x = narrow ? (Math.random() < .5 ? 1 + Math.random()*6 : 60 + Math.random()*30) : 56 + Math.random()*34;
-      y = narrow ? 64 + Math.random()*30 : 10 + Math.random()*78;
-      tries++;
-    } while (tries < 15 && spots.some(function(s){ return Math.abs(s[0]-x) < 18 && Math.abs(s[1]-y) < 12; }));
-    return [x, y];
-  }
-  function chip(){
-    if (!visible || document.hidden) return;
-    var it = items[n++ % items.length], p = spot(), c = document.createElement('div');
-    c.className = 'chip'; c.style.left = p[0]+'%'; c.style.top = p[1]+'%';
-    c.innerHTML = '<i>€</i><span><b>'+it[0]+'</b> · '+it[1]+'</span><span class="st">Owed</span>';
-    fx.appendChild(c); spots.push(p);
-    var over = c.offsetLeft + c.offsetWidth - (hero.clientWidth - 12); if (over > 0) c.style.left = Math.max(8, c.offsetLeft - over) + 'px';
-    requestAnimationFrame(function(){ requestAnimationFrame(function(){ c.classList.add('on'); }); });
-    setTimeout(function(){ c.classList.add('paid'); c.querySelector('i').textContent = '✓'; c.querySelector('.st').textContent = 'Paid'; }, 1500 + Math.random()*700);
-    setTimeout(function(){ c.classList.add('off'); }, 4200);
-    setTimeout(function(){ c.remove(); spots.splice(spots.indexOf(p), 1); }, 5400);
-  }
-  if ('IntersectionObserver' in window) new IntersectionObserver(function(e){ visible = e[0].isIntersecting; }).observe(hero);
-  chip(); setTimeout(chip, 700); setInterval(chip, hero.clientWidth < 860 ? 2200 : 1300);
-
-  // "you got paid" notification on the hero phone
-  var phone = document.querySelector('.hero .device');
-  if (phone) {
-    var notes = [['Payment received','Joanna &amp; Mark paid €450 for the wedding ✓'],['Invoice sent','Invoice #024 sent to The Grand Hotel'],['Reminder ready','Bob\'s Bar is 7 days late – tap to send a friendly reminder'],['Payment received','Bright Events paid €300 by PayPal ✓']];
-    var box = document.createElement('div'); box.className = 'note'; box.setAttribute('aria-hidden','true'); phone.appendChild(box);
-    var k = 0;
-    function show(){
-      if (!visible || document.hidden) return;
-      var m = notes[k++ % notes.length];
-      box.innerHTML = '<img src="assets/logo-180.png" alt=""><div><b>ShowFee · now</b>'+m[1]+'</div>';
-      box.classList.add('on'); setTimeout(function(){ box.classList.remove('on'); }, 3200);
+  // siteto.fit-style background: faint grid, dotted payment lines drawing from a € coin to a green tick
+  (function(){
+    var hero = document.querySelector('.hero'); if (!hero) return;
+    var c = document.createElement('canvas'); c.className = 'flow'; c.setAttribute('aria-hidden','true'); hero.insertBefore(c, hero.firstChild);
+    if (!c.getContext) return;
+    var x = c.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1), W, H, R = [], vis = true;
+    function size(){ var r = c.getBoundingClientRect(); W = r.width; H = r.height; c.width = W*dpr; c.height = H*dpr; x.setTransform(dpr,0,0,dpr,0,0); }
+    size(); addEventListener('resize', size);
+    function rnd(a,b){ return a + Math.random()*(b-a); }
+    function make(t){
+      var narrow = W < 860, x0 = narrow ? W*.04 : W*.55, x1 = W*.96, y0 = narrow ? H*.64 : H*.08, y1 = narrow ? H*.97 : H*.92;
+      var a = {x:rnd(x0,x1), y:rnd(y0,y1)}, b, n = 0;
+      do { b = {x:rnd(x0,x1), y:rnd(y0,y1)}; n++; } while (Math.hypot(b.x-a.x, b.y-a.y) < Math.min(W,H)*.3 && n < 20);
+      var dx = b.x-a.x, dy = b.y-a.y, bend = rnd(-.45,.45);
+      var c1 = {x:a.x+dx*.25-dy*bend, y:a.y+dy*.25+dx*bend}, c2 = {x:a.x+dx*.75+dy*bend, y:a.y+dy*.75-dx*bend};
+      var pts = [], prev = a, len = 0;
+      for (var i = 0; i <= 160; i++){ var u = i/160, v = 1-u;
+        var p = {x:v*v*v*a.x+3*v*v*u*c1.x+3*v*u*u*c2.x+u*u*u*b.x, y:v*v*v*a.y+3*v*v*u*c1.y+3*v*u*u*c2.y+u*u*u*b.y};
+        len += Math.hypot(p.x-prev.x, p.y-prev.y); p.l = len; pts.push(p); prev = p; }
+      return {pts:pts, len:len, t0:t, dur:rnd(2.6,4), hold:rnd(1.6,2.4)};
     }
-    setTimeout(show, 1800); setInterval(show, 5000);
-  }
+    function at(r,d){ var p = r.pts; for (var i = 1; i < p.length; i++) if (p[i].l >= d) return p[i]; return p[p.length-1]; }
+    function coin(px,py,al){ x.globalAlpha = al; x.strokeStyle = '#28beff'; x.lineWidth = 2; x.fillStyle = '#0b1433';
+      x.beginPath(); x.arc(px,py,10,0,7); x.fill(); x.stroke();
+      x.fillStyle = '#28beff'; x.font = '700 11px Poppins,sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('€',px,py+.5); }
+    function tick(px,py,al,sc){ x.globalAlpha = al; x.fillStyle = '#2ecc71'; x.beginPath(); x.arc(px,py,11*sc,0,7); x.fill();
+      x.strokeStyle = '#06210f'; x.lineWidth = 2.6; x.lineCap = 'round'; x.lineJoin = 'round';
+      x.beginPath(); x.moveTo(px-5*sc,py); x.lineTo(px-1.5*sc,py+3.6*sc); x.lineTo(px+5*sc,py-3.6*sc); x.stroke(); }
+    function grid(){ x.globalAlpha = .06; x.strokeStyle = '#ffffff'; x.lineWidth = 1; var g = 56; x.beginPath();
+      for (var gx = W%g/2; gx < W; gx += g){ x.moveTo(gx,0); x.lineTo(gx,H); } for (var gy = 0; gy < H; gy += g){ x.moveTo(0,gy); x.lineTo(W,gy); } x.stroke(); }
+    function frame(now){
+      var t = now/1000; x.clearRect(0,0,W,H); grid();
+      var want = W < 860 ? 2 : 5; while (R.length < want) R.push(make(t - rnd(0,.4)));
+      for (var k = R.length-1; k >= 0; k--){
+        var r = R[k], e = t-r.t0, p = Math.min(1, e/r.dur), fade = Math.max(0, Math.min(1, 1-(e-r.dur-r.hold)/.8));
+        if (fade <= 0){ R.splice(k,1); continue; }
+        var d = r.len*(1-Math.pow(1-p,3));
+        for (var s = 0; s < d; s += 14){ var q = at(r,s); x.globalAlpha = .55*fade; x.fillStyle = s < d-50 ? '#8f6bff' : '#28beff'; x.beginPath(); x.arc(q.x,q.y,2.3,0,7); x.fill(); }
+        coin(r.pts[0].x, r.pts[0].y, fade*.9);
+        if (p < 1){ var h = at(r,d); x.globalAlpha = fade; x.fillStyle = '#28beff'; x.shadowColor = '#28beff'; x.shadowBlur = 14; x.beginPath(); x.arc(h.x,h.y,4,0,7); x.fill(); x.shadowBlur = 0; }
+        else { var b = r.pts[r.pts.length-1], pop = Math.min(1,(e-r.dur)/.35); tick(b.x, b.y, fade*.9, pop < 1 ? .6+.55*Math.sin(pop*Math.PI/2) : 1); }
+      }
+      x.globalAlpha = 1; if (vis) requestAnimationFrame(frame);
+    }
+    if ('IntersectionObserver' in window) new IntersectionObserver(function(e){ var was = vis; vis = e[0].isIntersecting; if (vis && !was) requestAnimationFrame(frame); }).observe(hero);
+    requestAnimationFrame(frame);
+  })();
 
   // ===== Further down the page =====
-
-  // cards that float beside the phone in each section, flipping when "paid"
-  var rowSets = [
-    {cls:'', items:[['Radisson Blu','€400','Overdue','late'],['Joanna & Mark','€900','Owed'],['Bob\'s Bar','€150','Owed']], done:'Paid'},
-    {cls:'blue', items:[['PayPal','€300','Link sent'],['Revolut','€120','Link sent'],['Stripe','€450','Link sent']], done:'Paid'},
-    {cls:'late', items:[['Bob\'s Bar','7 days late','Late'],['Radisson Blu','12 days late','Late']], done:'Reminder sent'},
-    {cls:'blue', items:[['Invoice #024','€450','Creating PDF'],['Invoice #025','€300','Creating PDF']], done:'Sent'}
-  ];
-  document.querySelectorAll('.rows .row').forEach(function(row, ri){
-    var vis = row.querySelector('.vis'), dev = vis.firstElementChild, set = rowSets[ri]; if (!set) return;
-    var on = false, i = 0, side = 0;
-    new IntersectionObserver(function(e){ on = e[0].isIntersecting; }, {threshold:.25}).observe(vis);
-    function spawn(){
-      if (!on || document.hidden) return;
-      var it = set.items[i++ % set.items.length], s = document.createElement('div'); s.className = 'side';
-      var cls = it[3] || set.cls;
-      s.innerHTML = '<div class="chip '+cls+'"><i>'+(cls==='late'?'!':'€')+'</i><span><b>'+it[0]+'</b> · '+it[1]+'</span><span class="st">'+it[2]+'</span></div>';
-      vis.appendChild(s);
-      var c = s.firstChild, vr = vis.getBoundingClientRect(), dr = dev.getBoundingClientRect(), w = c.offsetWidth, h = c.offsetHeight;
-      var left = (side++ % 2 === 0) ? dr.left - vr.left - w * .55 : dr.right - vr.left - w * .45;
-      var top = dr.top - vr.top + dr.height * (.18 + Math.random() * .6);
-      var pageLeft = vr.left + left; if (pageLeft < 8) left += 8 - pageLeft; if (vr.left + left + w > innerWidth - 8) left -= vr.left + left + w - innerWidth + 8;
-      s.style.left = left + 'px'; s.style.top = top + 'px';
-      requestAnimationFrame(function(){ requestAnimationFrame(function(){ c.classList.add('on'); }); });
-      setTimeout(function(){ c.classList.remove('late','blue'); c.classList.add('paid'); c.querySelector('i').textContent = '✓'; c.querySelector('.st').textContent = set.done; }, 1600);
-      setTimeout(function(){ c.classList.add('off'); }, 4000);
-      setTimeout(function(){ s.remove(); }, 5200);
-    }
-    setInterval(spawn, 2600 + ri * 150);
-  });
-
-  // PAID stamp on the invoice
-  var paper = document.querySelector('.rows .paper');
-  if (paper) {
-    var st = document.createElement('div'); st.className = 'stamp'; st.textContent = 'PAID'; st.setAttribute('aria-hidden','true'); paper.appendChild(st);
-    new IntersectionObserver(function(e){ st.classList.toggle('go', e[0].isIntersecting); }, {threshold:.4}).observe(paper);
-    st.addEventListener('animationiteration', function(){ setTimeout(function(){ paper.classList.remove('thud'); void paper.offsetWidth; paper.classList.add('thud'); }, 400); });
-    setTimeout(function(){ paper.classList.add('thud'); }, 0);
-  }
 
   // screenshots in "everything else": how far each one can scroll
   function pans(){ document.querySelectorAll('.more .crop').forEach(function(cr){ var im = cr.querySelector('img'); if (!im) return;
