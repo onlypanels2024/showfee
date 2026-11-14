@@ -38,7 +38,7 @@ body.booking{background:var(--bg2);min-height:100vh}
 .bk-fields input,.bk-fields textarea{border-radius:12px;border:1px solid #2b376e;background:#121c45;color:var(--text);padding:11px 13px;font:inherit;font-size:15px;min-width:0;resize:vertical}
 .bk-fields input:focus,.bk-fields textarea:focus{outline:2px solid var(--c1);outline-offset:1px;border-color:transparent}
 .bk-fields input::placeholder{color:#7d87b0}
-.bk-two{display:flex;gap:10px}.bk-two label{flex:1;min-width:0}
+.bk-fields-extra{display:flex;flex-direction:column;gap:10px}.bk-fields-extra:empty{display:none}
 .bk-btn{margin-top:6px;height:52px;border:0;border-radius:14px;background:#ffd400;color:#1f1a00;font:inherit;font-weight:700;font-size:16px;cursor:pointer;padding:0 22px}
 .bk-btn:disabled{opacity:.6;cursor:default}
 .bk-err{margin:0;color:#ffb4b4;font-size:14px}
