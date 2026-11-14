@@ -29,7 +29,21 @@ function fill() {
   document.querySelectorAll('[data-tagline]').forEach((e) => (e.textContent = page.tagline || ''));
   document.querySelectorAll('[data-initial]').forEach((e) => (e.textContent = page.name.charAt(0).toUpperCase()));
   document.title = 'Book ' + page.name + ' – ShowFee';
+  // Extra questions are written by the ShowFee user in the app (e.g. "Event", "Venue", "Service"), any number up to 6.
+  const box = $('extras');
+  box.textContent = '';
+  questions().forEach((q, i) => {
+    const l = document.createElement('label');
+    l.textContent = q;
+    const inp = document.createElement('input');
+    inp.name = 'q' + i;
+    inp.maxLength = 200;
+    l.appendChild(inp);
+    box.appendChild(l);
+  });
 }
+
+function questions() { return Array.isArray(page.fields) ? page.fields : []; }
 
 function available(d) {
   if (d <= today) return false;                                   // from tomorrow onwards
@@ -79,7 +93,7 @@ async function send(ev) {
   $('send').disabled = true;
   $('send').textContent = 'Sending…';
   const req = { slug, owner: page.uid, date: iso(picked), name: v('name'), contact: v('contact'),
-                event: v('event'), venue: v('venue'), message: v('message'), status: 'new' };
+                ask: questions(), answers: questions().map((q, i) => v('q' + i)), message: v('message'), status: 'new' };
   try {
     if (demo) await new Promise((r) => setTimeout(r, 700));
     else await fs.addDoc(fs.collection(db, 'requests'), { ...req, created: fs.serverTimestamp() });
@@ -100,7 +114,13 @@ async function load() {
   try {
     if (demo) {
       const busy = [3, 4, 9, 17, 23].map((n) => iso(new Date(today.getFullYear(), today.getMonth(), today.getDate() + n)));
-      page = { uid: 'demo', name: 'Gary Falzon', tagline: 'Singer · Malta', accepting: true, days: [1, 2, 3, 4, 5, 6, 7], busy };
+      page = { uid: 'demo', name: 'Gary Falzon', tagline: 'Singer · Malta', accepting: true, days: [1, 2, 3, 4, 5, 6, 7], busy,
+               fields: ['Event', 'Venue'] };
+      // Preview other questions: ?u=demo&fields=Service|Hair length   (or fields=none)
+      const fq = new URLSearchParams(location.search).get('fields');
+      if (fq !== null) page.fields = fq === 'none' ? [] : fq.split('|');
+      const nq = new URLSearchParams(location.search).get('name');
+      if (nq) { page.name = nq; page.tagline = new URLSearchParams(location.search).get('tag') || ''; }
     } else {
       if (!window.SHOWFEE_FIREBASE) throw new Error('Booking pages are not switched on yet');
       const app = await import(`https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-app.js`);

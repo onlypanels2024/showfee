@@ -52,10 +52,7 @@
       <h2 id="picked">Choose a date above</h2>
       <label>Your name<input name="name" autocomplete="name" maxlength="80" required></label>
       <label>Email or phone<input name="contact" autocomplete="email" maxlength="120" required></label>
-      <div class="bk-two">
-        <label>Event<input name="event" maxlength="80" placeholder="e.g. Wedding"></label>
-        <label>Venue<input name="venue" maxlength="80" placeholder="e.g. Mdina"></label>
-      </div>
+      <div id="extras" class="bk-fields-extra"></div>
       <label>Message (optional)<textarea name="message" maxlength="500" rows="2"></textarea></label>
       <p class="bk-err" id="formErr" role="alert" hidden></p>
       <button class="bk-btn" type="submit" id="send">Send booking request</button>

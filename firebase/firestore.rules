@@ -8,15 +8,23 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function str(v, max) { return v is string && v.size() <= max; }
     function filled(v, max) { return str(v, max) && v.trim().size() > 0; }
+    // A list of up to 6 short texts (the user's own booking questions, or a client's answers to them).
+    function texts(l, max) {
+      return l is list && l.size() <= 6
+        && (l.size() < 1 || str(l[0], max)) && (l.size() < 2 || str(l[1], max))
+        && (l.size() < 3 || str(l[2], max)) && (l.size() < 4 || str(l[3], max))
+        && (l.size() < 5 || str(l[4], max)) && (l.size() < 6 || str(l[5], max));
+    }
 
     match /pages/{slug} {
       function validPage(d) {
-        return d.keys().hasOnly(['uid', 'name', 'tagline', 'accepting', 'days', 'busy', 'updated'])
+        return d.keys().hasOnly(['uid', 'name', 'tagline', 'accepting', 'days', 'busy', 'fields', 'updated'])
           && filled(d.name, 60)
           && str(d.get('tagline', ''), 80)
           && d.accepting is bool
           && d.days is list && d.days.size() <= 7
           && d.busy is list && d.busy.size() <= 400
+          && texts(d.get('fields', []), 40)
           && d.updated == request.time;
       }
 
@@ -35,7 +43,7 @@ service cloud.firestore {
     match /requests/{id} {
       // Anyone may send a request, but only a well-formed one, to a page that is taking requests.
       allow create: if request.resource.data.keys().hasOnly(
-            ['slug', 'owner', 'date', 'name', 'contact', 'event', 'venue', 'message', 'status', 'created'])
+            ['slug', 'owner', 'date', 'name', 'contact', 'ask', 'answers', 'message', 'status', 'created'])
         && request.resource.data.keys().hasAll(['slug', 'owner', 'date', 'name', 'contact', 'status', 'created'])
         && str(request.resource.data.slug, 32)
         && exists(/databases/$(database)/documents/pages/$(request.resource.data.slug))
@@ -45,8 +53,10 @@ service cloud.firestore {
         && request.resource.data.date.matches('^20[0-9]{2}-[01][0-9]-[0-3][0-9]$')
         && filled(request.resource.data.name, 80)
         && filled(request.resource.data.contact, 120)
-        && str(request.resource.data.get('event', ''), 80)
-        && str(request.resource.data.get('venue', ''), 80)
+        // The questions must be exactly the ones on the page, with one answer each.
+        && request.resource.data.get('ask', []) == get(/databases/$(database)/documents/pages/$(request.resource.data.slug)).data.get('fields', [])
+        && texts(request.resource.data.get('answers', []), 200)
+        && request.resource.data.get('answers', []).size() == request.resource.data.get('ask', []).size()
         && str(request.resource.data.get('message', ''), 500)
         && request.resource.data.status == 'new'
         && request.resource.data.created == request.time;
