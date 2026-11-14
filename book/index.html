@@ -1,0 +1,76 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="../assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="book.css">
+<title>Book a date – ShowFee</title>
+<meta name="description" content="Pick a free date and send a booking request.">
+<meta name="robots" content="noindex">
+</head><body class="booking">
+<main class="bk" aria-live="polite">
+
+  <div id="loading" class="bk-state"><div class="spinner" aria-hidden="true"></div><p>Loading…</p></div>
+
+  <div id="missing" class="bk-state" hidden>
+    <h1>This booking link doesn’t exist</h1>
+    <p>Check the link you were sent, or ask the person for it again.</p>
+  </div>
+
+  <div id="closed" class="bk-state" hidden>
+    <h1 data-name></h1>
+    <p>Isn’t taking new booking requests at the moment. Please get in touch with them directly.</p>
+  </div>
+
+  <div id="error" class="bk-state" hidden>
+    <h1>Something went wrong</h1>
+    <p>We couldn’t load this page. Check your internet connection and try again.</p>
+    <button class="bk-btn" type="button" onclick="location.reload()">Try again</button>
+  </div>
+
+  <form id="form" hidden novalidate>
+    <header class="bk-head">
+      <div class="bk-avatar" aria-hidden="true" data-initial></div>
+      <div><h1 data-name></h1><p class="bk-tag" data-tagline></p></div>
+    </header>
+
+    <section class="bk-cal" aria-labelledby="cal-title">
+      <div class="bk-cal-top">
+        <h2 id="cal-title">Pick a date</h2>
+        <div class="bk-month">
+          <button type="button" id="prev" aria-label="Previous month"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <span id="month"></span>
+          <button type="button" id="next" aria-label="Next month"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+      <div class="bk-dow" aria-hidden="true"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+      <div class="bk-days" id="days" role="grid" aria-labelledby="month"></div>
+      <div class="bk-key"><span><i class="k-free"></i>Free</span><span><i class="k-pick"></i>Your pick</span><span><i class="k-off"></i>Not available</span></div>
+    </section>
+
+    <section class="bk-fields" id="fields">
+      <h2 id="picked">Choose a date above</h2>
+      <label>Your name<input name="name" autocomplete="name" maxlength="80" required></label>
+      <label>Email or phone<input name="contact" autocomplete="email" maxlength="120" required></label>
+      <div class="bk-two">
+        <label>Event<input name="event" maxlength="80" placeholder="e.g. Wedding"></label>
+        <label>Venue<input name="venue" maxlength="80" placeholder="e.g. Mdina"></label>
+      </div>
+      <label>Message (optional)<textarea name="message" maxlength="500" rows="2"></textarea></label>
+      <p class="bk-err" id="formErr" role="alert" hidden></p>
+      <button class="bk-btn" type="submit" id="send">Send booking request</button>
+      <p class="bk-small"><span data-first></span> will reply to you directly. Your details are only shared with them. <a href="../privacy.html">Privacy</a></p>
+    </section>
+  </form>
+
+  <div id="sent" class="bk-state" hidden>
+    <div class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <h1>Request sent</h1>
+    <p id="sentText"></p>
+  </div>
+
+  <p class="bk-powered">Powered by <a href="../index.html">ShowFee</a></p>
+</main>
+<script src="config.js"></script>
+<script type="module" src="book.js"></script>
+</body></html>

@@ -1,0 +1,51 @@
+/* ShowFee public booking page */
+body.booking{background:var(--bg2);min-height:100vh}
+.bk{max-width:460px;margin:0 auto;padding:20px 20px 32px}
+.bk[hidden],.bk [hidden]{display:none!important}
+.bk section{padding:0}
+.bk h1{font-size:22px;line-height:1.25;margin:0}
+.bk h2{font-size:16px;margin:0}
+.bk-state{text-align:center;padding:72px 8px 24px}
+.bk-state h1{font-size:24px;margin-bottom:10px}
+.bk-state p{color:var(--muted);margin:0 0 20px}
+.spinner{width:36px;height:36px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--c1);margin:0 auto 14px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(1turn)}}
+
+.bk-head{display:flex;align-items:center;gap:14px;margin:8px 0 20px}
+.bk-avatar{width:58px;height:58px;border-radius:50%;flex:none;background:var(--grad);color:#0b1433;display:grid;place-items:center;font-weight:700;font-size:24px}
+.bk-tag{margin:2px 0 0;color:var(--muted);font-size:14px}
+
+.bk-cal{margin-top:4px}
+.bk-cal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
+.bk-month{display:flex;align-items:center;gap:8px;font-size:14px;color:#c3cae8;white-space:nowrap}
+.bk-month button{width:40px;height:40px;border-radius:10px;border:1px solid #2b376e;background:transparent;color:#c3cae8;display:grid;place-items:center;cursor:pointer}
+.bk-month button:disabled{opacity:.35;cursor:default}
+.bk-month svg,.bk-tick svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bk-dow,.bk-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.bk-dow{font-size:12px;color:var(--dim);text-align:center;margin-bottom:5px}
+.bk-days button,.bk-days span{height:40px;border-radius:10px;font:inherit;font-size:14px;display:grid;place-items:center}
+.bk-days button{background:#1b2a5e;border:1px solid #3a4b8f;color:var(--text);cursor:pointer}
+.bk-days button:hover{border-color:var(--c1)}
+.bk-days button[aria-pressed="true"]{background:var(--c1);border-color:var(--c1);color:#06233a;font-weight:700}
+.bk-days .off{border:1px dashed #3a4268;color:var(--dim)}
+.bk-key{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:10px;flex-wrap:wrap}
+.bk-key span{display:flex;align-items:center;gap:6px}
+.bk-key i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.k-free{background:#1b2a5e;border:1px solid #3a4b8f}.k-pick{background:var(--c1)}.k-off{border:1px dashed #3a4268}
+
+.bk-fields{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.bk-fields label{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted)}
+.bk-fields input,.bk-fields textarea{border-radius:12px;border:1px solid #2b376e;background:#121c45;color:var(--text);padding:11px 13px;font:inherit;font-size:15px;min-width:0;resize:vertical}
+.bk-fields input:focus,.bk-fields textarea:focus{outline:2px solid var(--c1);outline-offset:1px;border-color:transparent}
+.bk-fields input::placeholder{color:#7d87b0}
+.bk-two{display:flex;gap:10px}.bk-two label{flex:1;min-width:0}
+.bk-btn{margin-top:6px;height:52px;border:0;border-radius:14px;background:#ffd400;color:#1f1a00;font:inherit;font-weight:700;font-size:16px;cursor:pointer;padding:0 22px}
+.bk-btn:disabled{opacity:.6;cursor:default}
+.bk-err{margin:0;color:#ffb4b4;font-size:14px}
+.bk-small{margin:2px 0 0;font-size:12px;color:var(--dim);text-align:center}
+.bk-small a{color:var(--muted)}
+.bk-tick{width:64px;height:64px;border-radius:50%;background:#2ecc71;color:#06210f;display:grid;place-items:center;margin:0 auto 16px}
+.bk-tick svg{width:32px;height:32px;stroke-width:3}
+.bk-powered{text-align:center;font-size:12px;color:var(--dim);margin-top:26px}
+.bk-powered a{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.spinner{animation:none}}
