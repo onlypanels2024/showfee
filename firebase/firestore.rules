@@ -29,8 +29,10 @@ service cloud.firestore {
       }
 
       allow read: if true;
+      // Anonymous accounts are only for ShowFee's automatic tests: they may only make "test-" pages.
       allow create: if signedIn()
         && slug.matches('^[a-z0-9][a-z0-9-]{1,30}$')
+        && (request.auth.token.firebase.sign_in_provider != 'anonymous' || slug.matches('^test-[a-z0-9-]+$'))
         && request.resource.data.uid == request.auth.uid
         && validPage(request.resource.data);
       allow update: if signedIn()
