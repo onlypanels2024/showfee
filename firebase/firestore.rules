@@ -28,7 +28,8 @@ service cloud.firestore {
           && d.updated == request.time;
       }
 
-      allow read: if true;
+      // Anyone can open one page by its link, but nobody can list all pages.
+      allow get: if true;
       // Anonymous accounts are only for ShowFee's automatic tests: they may only make "test-" pages.
       allow create: if signedIn()
         && slug.matches('^[a-z0-9][a-z0-9-]{1,30}$')
