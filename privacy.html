@@ -2,16 +2,29 @@
 <header class="top"><div class="wrap"><a class="logo" href="index.html"><img src="assets/logo-180.png" alt=""><span class="brand"><span class="grad">S</span>how<span class="grad">F</span>ee</span></a><nav><a href="index.html#features" class="hide-s">Features</a><a href="privacy.html">Privacy</a><a href="index.html#contact">Contact</a></nav></div></header>
 <main class="doc">
 <h1>Privacy policy</h1>
-<div class="date">Last updated: 7 October 2026</div>
+<div class="date">Last updated: 15 November 2026</div>
 
-<div class="box"><b>The short version:</b> everything you enter in ShowFee stays on your phone. We don't run servers, we don't collect your data, and there are no ads or tracking. If you choose to sign in with Google or Microsoft, ShowFee only uses that to send the emails you approve and add the calendar events you choose.</div>
+<div class="box"><b>The short version:</b> your bookings, clients, fees and payments stay on your phone, and there are no ads or tracking. If you choose to sign in with Google or Microsoft, ShowFee only uses that to send the emails you approve and add the calendar events you choose. If you set up a <b>booking link</b>, only what that link needs – your public booking page and the requests clients send you – is kept online in Google Firebase, where only you can read the requests.</div>
 
 <h2>Who we are</h2>
 <p>ShowFee is an Android app made by Gary Falzon in Malta ("we", "us"). For anything about privacy, contact us at <a href="mailto:showfee.app@gmail.com">showfee.app@gmail.com</a>.</p>
 
 <h2>What you store in ShowFee</h2>
 <p>You can enter your bookings (clients, venues, dates, fees and notes), payments, expenses, client contact details (names, email addresses, phone numbers), your own business details (name, contact details, address, VAT number, bank and payment details), an optional logo, and your app settings.</p>
-<p>This information is stored <b>only in the app's private storage on your phone</b>. It is not sent to us – we have no servers and cannot see it.</p>
+<p>This information is stored <b>only in the app's private storage on your phone</b>. It is not sent to us and we cannot see it. The only exception is the optional booking link, described below.</p>
+
+<h2>Your booking link (optional)</h2>
+<p>With ShowFee Pro you can set up a booking link (<b>showfee.app/book/your-name</b>) and share it anywhere. Clients open it in their web browser, pick a free date and send you a request. Clients don't need an account or the app.</p>
+<p>To make this work, the following is kept online in <b>Google Firebase</b>, a service run by Google for us (booking pages and requests are stored in the EU, in Belgium):</p>
+<ul>
+<li><b>Your booking page</b> (anyone with the link can see it): the link name, the name and line you choose to show, the days you work, which dates are not available (dates only – never what the booking is, who it's for or the fee), and your own questions for clients.</li>
+<li><b>Booking requests</b> that clients send you: the date they asked for, their name, the phone number or email they give, their answers to your questions and their message. <b>Only you can read them</b>, in the app.</li>
+<li><b>Your sign-in:</b> you sign in with Google once so that only you can see your requests. Firebase Authentication keeps your Google account's email address and an account ID for this. It doesn't get access to your Gmail or anything else in your Google account.</li>
+</ul>
+<p>When you accept a request, ShowFee adds it to your bookings on your phone like any other booking. You can turn off your link at any time ("Taking bookings"), and <b>Remove my booking link</b> in the app deletes your booking page and all requests sent to it straight away.</p>
+
+<h2>If you send a booking request to a ShowFee user</h2>
+<p>The details you type on someone's booking page (your name, phone number or email, the date, your answers and message) are sent to that ShowFee user so they can reply to you, and kept in Google Firebase until that ShowFee user removes their booking link. That ShowFee user decides what to do with your request – they are responsible for it. You can also ask us to delete a request you sent: email <a href="mailto:showfee.app@gmail.com">showfee.app@gmail.com</a> with the booking link, date and your name.</p>
 
 <h2>When information leaves your phone</h2>
 <p>Only when you ask for it:</p>
@@ -24,6 +37,7 @@
 <tr><td>Send a pay link, or a client taps "Pay here"</td><td>The link opens your own PayPal, Revolut, Stripe or other payment page, with the amount filled in where the service allows. The payment goes straight from your client to you through that service – ShowFee never sees or handles it.</td></tr>
 <tr><td>Subscribe to ShowFee Pro</td><td>Payment is handled entirely by Google Play. ShowFee only asks Google Play, on your phone, whether your subscription is active. We never see your card or bank details. As the seller, Google shows us basic order information (such as the order number, date, country and amount) in our Google Play account, which we use only to run and support the subscription.</td></tr>
 <tr><td>Open ShowFee</td><td>If you installed it from Google Play, ShowFee asks Google Play whether a newer version is available, so it can offer you the update.</td></tr>
+<tr><td>Set up a booking link</td><td>Your booking page details are saved in Google Firebase and kept up to date (for example when a date becomes busy). ShowFee checks for new requests when you open the app.</td></tr>
 <tr><td>Set up a backup file</td><td>After each change, ShowFee writes a copy of your data to the file you picked (for example in your Google Drive). That file belongs to you and is stored by the service you chose.</td></tr>
 <tr><td>Export to a spreadsheet</td><td>ShowFee saves a CSV file wherever you choose.</td></tr>
 </table>
@@ -33,6 +47,7 @@
 <p>Signing in is optional. ShowFee asks only for:</p>
 <ul>
 <li><b>Google:</b> permission to send email on your behalf (<code>gmail.send</code>) and your email address, so we can show which account you're sending from. ShowFee <b>cannot read</b> your emails.</li>
+<li><b>Google, for your booking link:</b> only your basic Google profile and email address, to sign you in to your booking link. ShowFee gets no access to your Gmail, contacts or files for this.</li>
 <li><b>Microsoft:</b> permission to send mail (<code>Mail.Send</code>), and – only if you add bookings to Outlook – to add events to your calendar (<code>Calendars.ReadWrite</code>). ShowFee does not read your emails.</li>
 </ul>
 <p>Sign-in is handled by Google's and Microsoft's own sign-in screens; ShowFee never sees your password. The access keys are kept on your phone by Google Play services and Microsoft's sign-in library.</p>
@@ -55,9 +70,10 @@
 <li>delete individual bookings, payments, expenses and clients in the app;</li>
 <li>delete everything by uninstalling ShowFee, or in Android Settings › Apps › ShowFee › Storage › Clear storage;</li>
 <li>delete any backup or export files from wherever you saved them;</li>
+<li>remove your booking link (Settings › Your booking link › Remove my booking link), which deletes your booking page and all requests sent to it;</li>
 <li>sign out in ShowFee (Settings › Email), and remove ShowFee's access at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a> (Google) or <a href="https://account.live.com/consent/Manage">account.live.com/consent/Manage</a> (Microsoft).</li>
 </ul>
-<p>Because we don't hold your data, there is nothing for us to delete on our side – but you're welcome to contact us with any question.</p>
+<p>Apart from the booking link, we don't hold your data. If you'd like us to delete your booking link sign-in account, or anything else connected to your booking link, email <a href="mailto:showfee.app@gmail.com">showfee.app@gmail.com</a>.</p>
 
 <h2>Your rights</h2>
 <p>Under the GDPR you have the right to access, correct, delete and move your personal data, and to object to its use. As your data is on your own device, you can do all of this directly in the app. You can also complain to Malta's data protection authority, the Information and Data Protection Commissioner (<a href="https://idpc.org.mt">idpc.org.mt</a>).</p>
