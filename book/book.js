@@ -29,6 +29,7 @@ function fill() {
   document.querySelectorAll('[data-tagline]').forEach((e) => (e.textContent = page.tagline || ''));
   document.querySelectorAll('[data-initial]').forEach((e) => (e.textContent = page.name.charAt(0).toUpperCase()));
   document.title = 'Book ' + page.name + ' – ShowFee';
+  brand(page.brand);
   // Extra questions are written by the ShowFee user in the app (e.g. "Event", "Venue", "Service"), any number up to 6.
   const box = $('extras');
   box.textContent = '';
@@ -41,6 +42,35 @@ function fill() {
     l.appendChild(inp);
     box.appendChild(l);
   });
+}
+
+// ShowFee Business: the user's logo, colour, light/dark page, and whether "Powered by ShowFee" shows.
+function brand(b) {
+  if (!b || typeof b !== 'object') return;
+  const body = document.body;
+  body.classList.add('bk-branded');
+  if (/^#[0-9a-fA-F]{6}$/.test(b.color || '')) {
+    body.style.setProperty('--bk-accent', b.color);
+    const n = parseInt(b.color.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, bl = n & 255;
+    body.style.setProperty('--bk-on-accent', (r * 299 + g * 587 + bl * 114) / 1000 > 150 ? '#14161c' : '#ffffff');
+  }
+  if (b.theme === 'light') body.classList.add('bk-light');
+  if (typeof b.logo === 'string' && b.logo.startsWith('data:image/')) {
+    document.querySelectorAll('.bk-avatar').forEach((a) => {
+      a.textContent = '';
+      const img = document.createElement('img');
+      img.src = b.logo;
+      img.alt = '';
+      a.appendChild(img);
+      a.classList.add('has-logo');
+    });
+  }
+  // Business pages usually show a business name ("Maria's Photography"), so use it in full
+  document.querySelectorAll('[data-first]').forEach((e) => (e.textContent = page.name));
+  if (b.powered === false) {
+    $('powered').hidden = true;
+    document.title = 'Book ' + page.name;
+  }
 }
 
 function questions() { return Array.isArray(page.fields) ? page.fields : []; }
@@ -97,7 +127,7 @@ async function send(ev) {
   try {
     if (demo) await new Promise((r) => setTimeout(r, 700));
     else await fs.addDoc(fs.collection(db, 'requests'), { ...req, created: fs.serverTimestamp() });
-    $('sentText').textContent = 'Thanks, ' + req.name.split(' ')[0] + '. ' + page.name.split(' ')[0] + ' has your request for '
+    $('sentText').textContent = 'Thanks, ' + req.name.split(' ')[0] + '. ' + (page.brand ? page.name : page.name.split(' ')[0]) + ' has your request for '
       + nice(picked) + ' and will reply to you at ' + req.contact + '.';
     show('sent');
     window.scrollTo(0, 0);
@@ -107,6 +137,14 @@ async function send(ev) {
     $('send').disabled = false;
     $('send').textContent = 'Send booking request';
   }
+}
+
+// A made-up sample logo for previews only (not a real business)
+function demoLogo() {
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#fff"/>'
+    + '<circle cx="50" cy="44" r="22" fill="none" stroke="#0f6b5c" stroke-width="6"/><circle cx="50" cy="44" r="9" fill="#0f6b5c"/>'
+    + '<rect x="24" y="74" width="52" height="7" rx="3.5" fill="#d9a441"/></svg>';
+  return 'data:image/svg+xml;base64,' + btoa(svg);
 }
 
 async function load() {
@@ -119,6 +157,12 @@ async function load() {
       // Preview other questions: ?u=demo&fields=Service|Hair length   (or fields=none)
       const fq = new URLSearchParams(location.search).get('fields');
       if (fq !== null) page.fields = fq === 'none' ? [] : fq.split('|');
+      // Preview ShowFee Business branding: &color=0f6b5c&theme=light&logo=1&powered=0
+      const q = new URLSearchParams(location.search);
+      if (q.get('color') || q.get('theme') || q.get('logo') || q.get('powered')) {
+        page.brand = { color: q.get('color') ? '#' + q.get('color') : undefined, theme: q.get('theme') || 'dark',
+          logo: q.get('logo') ? demoLogo() : undefined, powered: q.get('powered') !== '0' };
+      }
       const nq = new URLSearchParams(location.search).get('name');
       if (nq) { page.name = nq; page.tagline = new URLSearchParams(location.search).get('tag') || ''; }
     } else {

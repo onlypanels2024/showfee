@@ -17,8 +17,17 @@ service cloud.firestore {
     }
 
     match /pages/{slug} {
+      // ShowFee Business branding: colour, light/dark page, "Powered by ShowFee" on/off, and a small logo image.
+      function validBrand(b) {
+        return b is map && b.keys().hasOnly(['color', 'theme', 'powered', 'logo'])
+          && (!('color' in b) || (b.color is string && b.color.matches('^#[0-9a-fA-F]{6}$')))
+          && (!('theme' in b) || b.theme in ['light', 'dark'])
+          && (!('powered' in b) || b.powered is bool)
+          && (!('logo' in b) || (b.logo is string && b.logo.size() <= 150000 && b.logo.matches('^data:image/(png|jpeg);base64,.*')));
+      }
       function validPage(d) {
-        return d.keys().hasOnly(['uid', 'name', 'tagline', 'accepting', 'days', 'busy', 'fields', 'updated'])
+        return d.keys().hasOnly(['uid', 'name', 'tagline', 'accepting', 'days', 'busy', 'fields', 'brand', 'updated'])
+          && (!('brand' in d) || validBrand(d.brand))
           && filled(d.name, 60)
           && str(d.get('tagline', ''), 80)
           && d.accepting is bool
