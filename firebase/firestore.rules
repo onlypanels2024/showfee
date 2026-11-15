@@ -70,6 +70,15 @@ service cloud.firestore {
         && request.resource.data.status in ['new', 'accepted', 'declined'];
     }
 
+    match /devices/{uid} {
+      // The phones of one ShowFee user that get booking-request notifications. Only that user can see or change it.
+      allow read, delete: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['tokens', 'updated'])
+        && request.resource.data.tokens is list && request.resource.data.tokens.size() <= 20
+        && request.resource.data.updated == request.time;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
