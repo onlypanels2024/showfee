@@ -2,6 +2,7 @@ rules_version = '2';
 // ShowFee booking system – who may read and write what.
 // pages/{slug}     public booking page of one ShowFee user (name, free days, busy dates – no client details)
 // requests/{id}    booking requests sent from a booking page – only the page's owner can read them
+// contracts/{id}   ShowFee Business contracts – opened and signed by the client through a private link
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -86,6 +87,43 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['tokens', 'updated'])
         && request.resource.data.tokens is list && request.resource.data.tokens.size() <= 20
         && request.resource.data.updated == request.time;
+    }
+
+    match /contracts/{id} {
+      // ShowFee Business contracts. The id is long and random: only people given the link can open one.
+      // The ShowFee user signs it in the app and sends it; the client signs it once on showfee.app/sign.
+      function sig(s) { return s is string && s.size() <= 120000 && s.matches('^data:image/png;base64,.*'); }
+
+      allow get: if true;
+      allow list: if signedIn() && resource.data.owner == request.auth.uid;
+      // Anonymous accounts are only for ShowFee's automatic tests: they may only make "test-" contracts.
+      allow create: if signedIn()
+        && id.matches('^[A-Za-z0-9_-]{16,40}$')
+        && (request.auth.token.firebase.sign_in_provider != 'anonymous' || id.matches('^test-.*'))
+        && request.resource.data.keys().hasOnly(
+            ['owner', 'status', 'title', 'text', 'performer', 'performerSig', 'performerAt', 'client', 'created', 'version'])
+        && request.resource.data.owner == request.auth.uid
+        && request.resource.data.status == 'sent'
+        && filled(request.resource.data.title, 120)
+        && filled(request.resource.data.text, 20000)
+        && filled(request.resource.data.performer, 80)
+        && sig(request.resource.data.performerSig)
+        && request.resource.data.performerAt == request.time
+        && str(request.resource.data.client, 120)
+        && request.resource.data.created == request.time
+        && request.resource.data.version is int;
+      // The client signs once (name, signature, time). Nothing else in the contract can change.
+      allow update: if (resource.data.status == 'sent'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'clientName', 'clientSig', 'clientAt'])
+          && request.resource.data.status == 'signed'
+          && filled(request.resource.data.clientName, 80)
+          && sig(request.resource.data.clientSig)
+          && request.resource.data.clientAt == request.time)
+        // The ShowFee user can cancel a contract that hasn't been signed yet.
+        || (signedIn() && resource.data.owner == request.auth.uid && resource.data.status == 'sent'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+          && request.resource.data.status == 'void');
+      allow delete: if signedIn() && resource.data.owner == request.auth.uid;
     }
 
     match /{document=**} {

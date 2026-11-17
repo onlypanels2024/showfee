@@ -1,0 +1,32 @@
+/* ShowFee contract signing page (uses the booking page styles for the basics) */
+.sg-doc{background:#111a3d;border:1px solid #1f2a55;border-radius:16px;padding:18px 18px 14px;margin:6px 0 18px}
+.sg-doc h2{font-size:17px;margin:0 0 10px}
+.sg-text{white-space:pre-wrap;font-size:14px;line-height:1.6;color:#d6dbf2;overflow-wrap:anywhere}
+.sg-sigs{display:flex;flex-wrap:wrap;gap:16px;margin-top:18px}
+.sg-sig{flex:1 1 180px;min-width:0}
+.sg-sig img{display:block;width:100%;max-width:240px;height:80px;object-fit:contain;object-position:left bottom;background:#fff;border-radius:10px}
+.sg-line{display:flex;flex-direction:column;border-top:1px solid #3a4a8a;margin-top:6px;padding-top:4px;font-size:13px}
+.sg-line span{color:var(--muted);font-size:12px}
+.sg-ref{font-size:11.5px;color:var(--dim);margin:14px 0 0}
+.sg-padwrap{position:relative;display:flex;flex-direction:column;gap:5px}
+.sg-padlabel{font-size:13px;color:var(--muted)}
+.sg-pad{width:100%;height:150px;background:#fff;border-radius:12px;touch-action:none;cursor:crosshair;display:block}
+.sg-clear{position:absolute;right:8px;bottom:8px;border:0;background:#eef0f7;color:#3949ab;border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+.sg-agree{flex-direction:row!important;align-items:flex-start;gap:10px!important;font-size:14px!important;color:var(--text)!important}
+.sg-agree input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--c1)}
+.sg-err{color:#ff8a80;margin:0;font-size:14px}
+.sg-small{font-size:12.5px;color:var(--dim);margin:0;text-align:center}
+.sg-done{display:flex;flex-direction:column;gap:2px;background:rgba(46,125,50,.18);border:1px solid #2e7d32;border-radius:14px;padding:12px 14px;margin-bottom:12px;font-size:14px}
+.sg-done strong{color:#9be7a0}
+.sg-after{display:flex;flex-direction:column;gap:8px}
+.sg-powered{text-align:center;font-size:12.5px;color:var(--dim);margin-top:22px}
+.sg-powered a{color:var(--muted)}
+@media print{
+  body,body.booking{background:#fff!important;color:#000}
+  .sg-noprint{display:none!important}
+  .bk{max-width:none;padding:0}
+  .sg-doc{background:#fff;border:0;padding:0;color:#000}
+  .sg-text{color:#000;font-size:12pt}
+  .sg-line{border-color:#000}.sg-line span,.sg-ref{color:#444}
+  .sg-sig img{border:0}
+}
