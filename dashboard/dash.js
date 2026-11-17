@@ -364,6 +364,15 @@ function askDelete(btn, question, yes) {
   box.querySelector('[data-no]').addEventListener('click', () => drawer.redraw && drawer.redraw());
 }
 
+/** "You already have Bob's Bar at 21:00 on this day" – or '' when the day is free. */
+function clashText(day, exceptId) {
+  const l = D.gigs.filter((x) => x.day === day && x.status !== CANCELLED && !sameId(x.id, exceptId));
+  if (!l.length) return '';
+  const names = l.slice(0, 3).map((x) => x.client + (x.start >= 0 ? ' at ' + time(x.start) : '') + (x.status === PENCILLED ? ' (pencilled in)' : ''));
+  const list = names.length > 1 ? names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1] : names[0];
+  return `You already have ${list}${l.length > 3 ? ' and ' + (l.length - 3) + ' more' : ''} on this day`;
+}
+
 // ---- a booking
 function gigPanel(id, presetDay) {
   const isNew = id == null;
@@ -380,6 +389,7 @@ function gigPanel(id, presetDay) {
       ${field('Date', `<input type="date" name="day" required value="${inputDay(day)}">`)}
       ${field('Start time <em>(optional)</em>', `<input type="time" name="start" value="${isNew ? '' : time(g.start)}">`)}
     </div>
+    <p class="db-warn" id="gClash" hidden></p>
     <div class="db-two">
       ${field('Fee (' + esc(D.currency || 'EUR') + ')', `<input name="fee" inputmode="decimal" required value="${isNew ? '' : cents2(g.fee)}" placeholder="0.00">`)}
       ${field('Payment due', `<input type="date" name="due" value="${isNew ? '' : inputDay(g.due)}">`, isNew ? (D.terms ? `${D.terms} days after the date, unless you change it` : 'On the day, unless you change it') : '')}
@@ -410,6 +420,8 @@ function gigPanel(id, presetDay) {
   openDrawer(isNew ? 'New ' + D.one : g.client, html, () => {
     let st = status;
     const f = $('gigForm');
+    const clash = () => { const t = f.day.value ? clashText(dayFromInput(f.day.value), isNew ? null : g.id) : ''; $('gClash').textContent = t; $('gClash').hidden = !t; };
+    f.day.addEventListener('input', clash); f.day.addEventListener('change', clash); clash();
     f.querySelectorAll('#gStatus button').forEach((b) => b.addEventListener('click', () => {
       st = Number(b.dataset.s); f.querySelectorAll('#gStatus button').forEach((x) => x.classList.toggle('on', x === b));
     }));
