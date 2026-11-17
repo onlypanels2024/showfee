@@ -1,0 +1,118 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="../assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="dash.css">
+<title>Dashboard – ShowFee</title>
+<meta name="description" content="Your ShowFee bookings, calendar, clients and money on any computer.">
+<meta name="robots" content="noindex">
+</head><body class="db">
+
+<header class="db-top">
+  <a class="logo" href="../index.html"><img src="../assets/logo-180.png" alt=""><span class="brand"><span class="grad">S</span>how<span class="grad">F</span>ee</span></a>
+  <div class="db-who" id="who" hidden>
+    <div class="db-who-text"><b id="whoName"></b><span id="synced"></span></div>
+    <button class="db-ghost" id="signout" type="button">Sign out</button>
+  </div>
+</header>
+
+<div id="loading" class="db-state"><div class="db-spin" aria-hidden="true"></div><p>Loading…</p></div>
+
+<section id="signin" class="db-state" hidden>
+  <div class="db-card db-hello">
+    <img src="../assets/logo-180.png" alt="" class="db-hello-logo">
+    <h1>Your ShowFee dashboard</h1>
+    <p>See your bookings, calendar, who owes you and your clients on any computer.</p>
+    <button class="db-google" id="google" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Sign in with Google</button>
+    <p class="db-small" id="signinErr" hidden></p>
+    <p class="db-small">Use the same Google account you signed in with in the ShowFee app.<br>The dashboard is part of <b>ShowFee Business</b>.</p>
+  </div>
+</section>
+
+<section id="empty" class="db-state" hidden>
+  <div class="db-card db-hello">
+    <h1>Switch on your dashboard in the app</h1>
+    <ol class="db-steps">
+      <li>Open <b>ShowFee</b> on your phone</li>
+      <li>Go to <b>Settings › Web dashboard</b></li>
+      <li>Turn on <b>Show my bookings on the web dashboard</b></li>
+    </ol>
+    <p class="db-small">Signed in as <span id="emptyEmail"></span>. Not the right account? <button class="db-link" id="signout2" type="button">Sign out</button></p>
+    <button class="db-btn" type="button" onclick="location.reload()">I've switched it on – refresh</button>
+  </div>
+</section>
+
+<div id="error" class="db-state" hidden>
+  <h1>Something went wrong</h1>
+  <p>We couldn't load your dashboard. Check your internet connection and try again.</p>
+  <button class="db-btn" type="button" onclick="location.reload()">Try again</button>
+</div>
+
+<div id="app" class="db-app" hidden>
+  <nav class="db-nav" aria-label="Dashboard">
+    <button data-tab="overview" class="on" type="button"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3zm0 8h8v-6H3zm10 0h8V11h-8zm0-18v6h8V3z"/></svg>Overview</button>
+    <button data-tab="bookings" type="button"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 16H5V8h14zM7 10h5v5H7z"/></svg><span data-many-cap>Bookings</span></button>
+    <button data-tab="calendar" type="button"><svg viewBox="0 0 24 24"><path d="M20 3h-1V1h-2v2H7V1H5v2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 18H4V8h16zM6 10h4v4H6zm6 0h4v4h-4z"/></svg>Calendar</button>
+    <button data-tab="clients" type="button"><svg viewBox="0 0 24 24"><path d="M16 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05A4.2 4.2 0 0 1 17 16.5V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Clients</button>
+    <button data-tab="money" type="button"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Money</button>
+  </nav>
+
+  <main class="db-main">
+    <p class="db-readonly">You're looking at a copy from your phone. To change something, use the ShowFee app.</p>
+
+    <section data-page="overview">
+      <h1 class="db-h1">Hello<span id="hello"></span></h1>
+      <div class="db-tiles">
+        <div class="db-tile db-tile-hero"><span>Owed to you</span><b id="tOwed"></b><small id="tOwedSub"></small></div>
+        <div class="db-tile"><span>Earned this month</span><b id="tMonth"></b><small id="tMonthSub"></small></div>
+        <div class="db-tile"><span>This year so far</span><b id="tYear"></b><small id="tYearSub"></small></div>
+        <div class="db-tile"><span id="tNextLabel">Next 30 days</span><b id="tNext"></b><small id="tNextSub"></small></div>
+      </div>
+      <div class="db-cols">
+        <div class="db-card"><h2>Coming up</h2><div id="upcoming" class="db-list"></div></div>
+        <div class="db-card"><h2>Waiting to be paid</h2><div id="owing" class="db-list"></div></div>
+      </div>
+    </section>
+
+    <section data-page="bookings" hidden>
+      <div class="db-bar">
+        <h1 class="db-h1" data-many-cap>Bookings</h1>
+        <div class="db-filters">
+          <div class="db-seg" id="bkSeg"><button data-f="upcoming" class="on" type="button">Upcoming</button><button data-f="past" type="button">Past</button><button data-f="all" type="button">All</button></div>
+          <input id="bkSearch" class="db-search" type="search" placeholder="Search client or event">
+        </div>
+      </div>
+      <div class="db-card db-tablewrap"><table class="db-table" id="bkTable"><thead><tr><th>Date</th><th>Client</th><th>Event</th><th>Status</th><th class="r">Fee</th><th class="r">Still owed</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <section data-page="calendar" hidden>
+      <div class="db-bar">
+        <h1 class="db-h1" id="calTitle"></h1>
+        <div class="db-filters"><button class="db-ghost" id="calPrev" type="button" aria-label="Previous month">‹</button><button class="db-ghost" id="calToday" type="button">Today</button><button class="db-ghost" id="calNext" type="button" aria-label="Next month">›</button></div>
+      </div>
+      <div class="db-card"><div class="db-cal" id="cal"></div></div>
+    </section>
+
+    <section data-page="clients" hidden>
+      <div class="db-bar"><h1 class="db-h1">Clients</h1><div class="db-filters"><input id="clSearch" class="db-search" type="search" placeholder="Search clients"></div></div>
+      <div class="db-card db-tablewrap"><table class="db-table" id="clTable"><thead><tr><th>Client</th><th>Email</th><th>Phone</th><th class="r" data-many-cap>Bookings</th><th class="r">Paid you</th><th class="r">Still owes</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <section data-page="money" hidden>
+      <div class="db-bar"><h1 class="db-h1">Money</h1></div>
+      <div class="db-tiles">
+        <div class="db-tile"><span>Earned in the last 12 months</span><b id="mEarned"></b></div>
+        <div class="db-tile"><span>Received</span><b id="mReceived"></b></div>
+        <div class="db-tile"><span>Expenses</span><b id="mSpent"></b></div>
+        <div class="db-tile db-tile-hero"><span>Take-home</span><b id="mNet"></b></div>
+      </div>
+      <div class="db-card"><h2>Earned per month</h2><div class="db-chart" id="chart"></div></div>
+      <div class="db-card db-tablewrap"><h2>Expenses</h2><table class="db-table" id="exTable"><thead><tr><th>Date</th><th>What</th><th>Category</th><th class="r">Amount</th></tr></thead><tbody></tbody></table></div>
+    </section>
+  </main>
+</div>
+
+<script src="../book/config.js"></script>
+<script src="dash.js" type="module"></script>
+</body></html>

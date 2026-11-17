@@ -3,6 +3,7 @@ rules_version = '2';
 // pages/{slug}     public booking page of one ShowFee user (name, free days, busy dates – no client details)
 // requests/{id}    booking requests sent from a booking page – only the page's owner can read them
 // contracts/{id}   ShowFee Business contracts – opened and signed by the client through a private link
+// dash/{uid}       ShowFee Business web dashboard – a copy of one user's bookings, only that user can read it
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -124,6 +125,16 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
           && request.resource.data.status == 'void');
       allow delete: if signedIn() && resource.data.owner == request.auth.uid;
+    }
+
+    match /dash/{uid} {
+      // The web dashboard copy: only its owner can read, write or delete it.
+      allow get, delete: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['uid', 'data', 'updated'])
+        && request.resource.data.uid == uid
+        && str(request.resource.data.data, 950000)
+        && request.resource.data.updated == request.time;
     }
 
     match /{document=**} {
