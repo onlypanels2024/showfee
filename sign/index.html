@@ -1,0 +1,83 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="../assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../book/book.css">
+<link rel="stylesheet" href="sign.css">
+<title>Sign your contract – ShowFee</title>
+<meta name="description" content="Read and sign your contract online.">
+<meta name="robots" content="noindex">
+</head><body class="booking">
+<main class="bk" aria-live="polite">
+
+  <div id="loading" class="bk-state"><div class="spinner" aria-hidden="true"></div><p>Loading…</p></div>
+
+  <div id="missing" class="bk-state" hidden>
+    <h1>This contract link doesn’t work</h1>
+    <p>Check the link you were sent, or ask for it again.</p>
+  </div>
+
+  <div id="void" class="bk-state" hidden>
+    <h1>This contract was cancelled</h1>
+    <p><span data-performer></span> cancelled this contract, so it can’t be signed. If you were expecting it, please get in touch with them.</p>
+  </div>
+
+  <div id="error" class="bk-state" hidden>
+    <h1>Something went wrong</h1>
+    <p>We couldn’t load this contract. Check your internet connection and try again.</p>
+    <button class="bk-btn" type="button" onclick="location.reload()">Try again</button>
+  </div>
+
+  <section id="contract" hidden>
+    <header class="bk-head sg-noprint">
+      <div class="bk-avatar" aria-hidden="true" data-initial></div>
+      <div><h1 data-performer></h1><p class="bk-tag" id="lead">sent you a contract to sign</p></div>
+    </header>
+
+    <div id="signedNote" class="sg-done sg-noprint" hidden>
+      <strong>Signed – thank you!</strong>
+      <span>Both of you have signed. Keep a copy for your records.</span>
+    </div>
+
+    <article class="sg-doc" id="doc">
+      <h2 id="title"></h2>
+      <div id="text" class="sg-text"></div>
+      <div class="sg-sigs">
+        <div class="sg-sig">
+          <img id="pSig" alt="">
+          <div class="sg-line"><b data-performer></b><span id="pWhen"></span></div>
+        </div>
+        <div class="sg-sig" id="cSigBox" hidden>
+          <img id="cSig" alt="">
+          <div class="sg-line"><b id="cName"></b><span id="cWhen"></span></div>
+        </div>
+      </div>
+      <p class="sg-ref">Signed online with ShowFee · reference <span id="ref"></span></p>
+    </article>
+
+    <form id="form" class="bk-fields sg-noprint" novalidate>
+      <h2>Sign the contract</h2>
+      <label>Your full name<input id="name" autocomplete="name" maxlength="80" placeholder="As it should appear on the contract" required></label>
+      <div class="sg-padwrap">
+        <span class="sg-padlabel">Sign here with your finger or mouse</span>
+        <canvas id="pad" class="sg-pad" aria-label="Signature area"></canvas>
+        <button type="button" id="clear" class="sg-clear">Clear</button>
+      </div>
+      <label class="sg-agree"><input type="checkbox" id="agree"> I have read and agree to this contract.</label>
+      <p id="formErr" class="sg-err" hidden></p>
+      <button class="bk-btn" id="signBtn" type="submit">Sign contract</button>
+      <p class="sg-small">Your name, signature and the time you sign are saved with the contract.</p>
+    </form>
+
+    <div id="after" class="sg-after sg-noprint" hidden>
+      <button class="bk-btn" type="button" id="save">Save a copy (PDF)</button>
+      <p class="sg-small">Choose “Save as PDF” in the window that opens.</p>
+    </div>
+
+    <p class="sg-powered sg-noprint" id="powered">Powered by <a href="https://showfee.app">ShowFee</a></p>
+  </section>
+</main>
+<script src="../book/config.js"></script>
+<script src="sign.js" type="module"></script>
+</body></html>
