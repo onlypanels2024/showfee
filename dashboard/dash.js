@@ -474,7 +474,7 @@ function clientPanel(name) {
       if (clash && (isNew || !sameId(clash.id, raw.id))) return err(f, 'You already have a client called ' + clash.name + '.');
       const d = { name: nm, email: f.email.value.trim(), phone: f.phone.value.trim(), notes: f.notes.value.trim() };
       if (isNew || raw.id == null) d.ref = newRef(); else d.id = realId(raw.id);
-      if (!isNew && raw.id == null) d.old = raw.name;
+      if (!isNew) d.old = raw.name;   // lets the phone find them by name too
       send({ t: 'client', d }, isNew ? 'Client added' : 'Changes saved');
       if (isNew) closeDrawer(); else drawer.redraw = () => clientPanel(nm);
     });

@@ -3,7 +3,8 @@ rules_version = '2';
 // pages/{slug}     public booking page of one ShowFee user (name, free days, busy dates – no client details)
 // requests/{id}    booking requests sent from a booking page – only the page's owner can read them
 // contracts/{id}   ShowFee Business contracts – opened and signed by the client through a private link
-// dash/{uid}       ShowFee Business web dashboard – a copy of one user's bookings, only that user can read it
+// dash/{uid}       web dashboard – a copy of one user's bookings, only that user can read it;
+//                  dash/{uid}/ops are changes made on the web, waiting for that user's phone
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -135,6 +136,16 @@ service cloud.firestore {
         && request.resource.data.uid == uid
         && str(request.resource.data.data, 950000)
         && request.resource.data.updated == request.time;
+
+      // Changes made on the web dashboard, waiting for the owner's phone to apply them (then the phone deletes them).
+      match /ops/{op} {
+        allow read, delete: if signedIn() && request.auth.uid == uid;
+        allow create: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['t', 'd', 'at'])
+          && request.resource.data.t in ['gig', 'gigDel', 'pay', 'payDel', 'client', 'clientDel', 'exp', 'expDel']
+          && request.resource.data.d is map && request.resource.data.d.size() <= 14
+          && request.resource.data.at == request.time;
+      }
     }
 
     match /{document=**} {
