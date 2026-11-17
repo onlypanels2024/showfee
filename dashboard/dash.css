@@ -1,4 +1,4 @@
-/* ShowFee web dashboard (ShowFee Business) – builds on the site's colours in style.css */
+/* ShowFee web dashboard (every plan) – builds on the site's colours in style.css */
 body.db{background:var(--bg);min-height:100vh}
 .db section{padding:0}
 .db [hidden]{display:none!important}

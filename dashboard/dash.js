@@ -1,4 +1,4 @@
-// ShowFee web dashboard (ShowFee Business): shows the copy of a user's bookings that the ShowFee app keeps
+// ShowFee web dashboard (every plan): shows the copy of a user's bookings that the ShowFee app keeps
 // in dash/{uid} once they switch it on (Settings › Web dashboard). Read-only. "?demo=1" shows sample data.
 
 const FB_VERSION = '11.1.0';
