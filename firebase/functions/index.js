@@ -1,6 +1,8 @@
 // ShowFee: tells a ShowFee user's phone straight away when
 //  - a client sends a booking request (a document is created in requests/), or
-//  - a client signs a contract (a document in contracts/ changes to "signed").
+//  - a client signs a contract (a document in contracts/ changes to "signed"), or
+//  - the user changes something on the web dashboard (a document is created in dash/{uid}/ops) – a silent
+//    message that makes the phone apply the change straight away.
 // Runs in Google Cloud (project showfee-app, europe-west1). It finds the owner's phones in devices/{uid} and
 // sends a data message (the app turns it into the notification). Phones that no longer exist are removed.
 const functions = require('@google-cloud/functions-framework');
@@ -33,6 +35,12 @@ async function push(owner, data) {
 
 functions.cloudEvent('notifyOwner', async (event) => {
   const path = String(event.subject || '').replace(/^documents\//, '');
+
+  const op = path.match(/^dash\/([^/]+)\/ops\/[^/]+$/);
+  if (op) {
+    await push(op[1], { type: 'dash_edit', id: '' });
+    return;
+  }
 
   if (/^contracts\/[^/]+$/.test(path)) {
     const snap = await db.doc(path).get();
