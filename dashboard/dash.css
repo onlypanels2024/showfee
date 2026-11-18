@@ -204,3 +204,9 @@ body.db{background:var(--bg);min-height:100vh}
 }
 .db-warn{margin:-4px 0 0;padding:9px 12px;border-radius:10px;background:rgba(255,179,0,.12);border:1px solid rgba(255,179,0,.28);color:#ffcf66;font-size:14px}
 .db-warn::before{content:"⚠  "}
+.db-bill{border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:14px}
+.db-bill div{display:flex;justify-content:space-between;gap:12px;padding:3px 0;color:var(--muted)}
+.db-bill div b{color:var(--text);font-weight:500}
+.db-bill .tot{border-top:1px solid var(--line);margin-top:4px;padding-top:7px}
+.db-bill .tot span,.db-bill .tot b{color:var(--text);font-weight:600}
+.db-bill small{display:block;color:var(--dim);font-size:12px;margin-top:6px}
